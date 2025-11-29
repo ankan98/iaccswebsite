@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 
 export default function Header() {
@@ -13,11 +14,11 @@ export default function Header() {
         </a>
 
         <nav className="flex items-center justify-center gap-10 px-5 py-4">
-            <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-[#525560]" href="#home">Home</a>
-            <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="#about">About us</a>
-            <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="#services">What We Do</a>
+            <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-[#525560]" href="/">Home</a>
+            <Link className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="/about-us">About us</Link>
+            <Link className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="#services">What We Do</Link>
             <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="#media">Media</a>
-            <a className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="#contact">Contact</a>
+            <Link className="font-medium text-base tracking-[0] leading-[normal] whitespace-nowrap text-secondary-text" href="/contact-us">Contact</Link>
         </nav>
 
         <button className="h-auto px-8 py-3 bg-gray-800 rounded hover:bg-opacity-90">
