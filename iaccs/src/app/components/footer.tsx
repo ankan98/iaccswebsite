@@ -6,10 +6,7 @@ export default function Footer() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 justify-between items-start">
             <div className="flex items-start gap-1">
                 <div className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">
-                    largerthan
-                </div>
-                <div className="font-normal text-white text-[25px] tracking-[0] leading-[44px] whitespace-nowrap">
-                    i
+                    ACCS
                 </div>
             </div>
 

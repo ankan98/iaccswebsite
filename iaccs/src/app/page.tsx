@@ -5,43 +5,28 @@ export default function Home() {
    
     <>
     {/* <!-- Header Section --> */}
-    <header className="relative w-full flex flex-col gap-48 bg-transparent bg-[url(/assets/images/banner.jpg)] bg-cover bg-center py-32 mt-20 bg-gray-500">
+    <header className="relative w-full flex flex-col gap-48 bg-transparent bg-[url(/assets/images/banner-img.png)] bg-cover bg-center py-32 mt-20 bg-gray-500">
       <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="container mx-auto px-[110px] relative z-[1]">
             <div className="w-full max-w-[642px] flex flex-col gap-12">
-                <h1 className="w-full max-w-[640px] font-bold text-white text-[64px] tracking-[0] leading-[76.8px]">
-                    Inclusive care for children with special needs
-                </h1>
+                <h1 className="w-full max-w-[640px] font-bold text-white text-[64px] tracking-[0] leading-[76.8px]">Bringing Healthcare to the Worlds Most Vulnerable</h1>
+                <p className="text-lg text-white">Join us in providing life-saving medical care to communities without access to the basic healthcare they need.</p>
 
                 <div className="flex gap-6">
-                    <button className="h-auto w-[148px] px-8 py-4 bg-white text-primary-text hover:bg-opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
+                    <button className="h-auto px-8 py-4 bg-white text-primary-text hover:bg-opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
                         <span className="font-medium text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
-                            What we do
+                            Volunteer Today
                         </span>
                     </button>
 
-                    <button className="inline-flex w-[140px] h-12 items-center justify-center gap-2 px-4 py-3 bg-transparent hover:opacity-80 transition-opacity">
+                    {/* <button className="inline-flex w-[140px] h-12 items-center justify-center gap-2 px-4 py-3 bg-transparent hover:opacity-80 transition-opacity">
                         <svg className="w-6 h-6 text-white fill-white" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 5v14l11-7z"/>
                         </svg>
                         <span className="font-medium text-white text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                             Play Video
                         </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div className="container mx-auto px-[110px] relative z-[1]">
-            <div className="flex items-center w-full max-w-[1283px]">
-                <div className="font-medium text-white text-lg text-right tracking-[0] leading-[normal] whitespace-nowrap">
-                    230 children under our care
-                </div>
-
-                <img className="flex-1 h-px mx-5 object-cover" alt="Line" src="/line-7.svg" />
-
-                <div className="font-medium text-white text-lg text-right tracking-[0] leading-[normal] whitespace-nowrap">
-                    58 donations collected
+                    </button> */}
                 </div>
             </div>
         </div>
@@ -55,58 +40,55 @@ export default function Home() {
                     <div className="flex items-center gap-4">
                         <div className="w-[72px] h-0.5 bg-primary-text"></div>
                         <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
-                            KNOW ABOUT US
+                            Know About Us
                         </div>
                     </div>
                 </div>
 
-                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">
-                    We provide a place for children with special needs
-                </h2>
+                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
 
                 <p className="text-secondary-text text-base tracking-[0] leading-[160%]">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                    varius enim in eros elementum tristique.
-                    <br /><br />
-                    Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut
-                    commodo diam libero vitae erat. Aenean faucibus nibh et justo cursus
-                    id rutrum lorem imperdiet. Nunc ut sem vitae risus tristique
+                    We are a global non-profit dedicated to providing free healthcare to underserved populations. From remote villages to disaster zones, we’re committed to making healthcare accessible to everyone.
                     posuere.
                 </p>
 
                 <div>
-                    <button className="bg-yellow hover:opacity-90 text-black font-medium text-base px-8 py-4 rounded h-auto">
+                    <button className="bg-yellow-500 hover:opacity-90 text-black font-medium text-base px-8 py-4 rounded h-auto">
                         Learn more
                     </button>
                 </div>
             </div>
 
             <div className="w-[480px] flex-shrink-0">
-                <img className="w-full h-auto" alt="Video" src="/video.png" />
+                <img className="w-full h-auto" alt="Video" src="/assets/images/about-us.png" />
             </div>
         </div>
+    </section>
 
-        <div className="flex flex-col gap-8">
-            <div className="w-full flex items-center gap-6">
-                <div className="font-medium text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
-                    OUR SUPPORTERS
+    <section>
+        <div className="max-w-[1500px] mx-auto px-[206px]">
+            <div className="flex">
+                <div className="flex items-center justify-center -rotate-90 ">
+                    <div className="flex items-center gap-6">
+                        <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
+                            WHAT WE DO
+                        </div>
+                        <div className="w-[72px] h-0.5 bg-gray-500"></div>
+                    </div>
                 </div>
-                <div className="flex-1 h-px bg-primary-text opacity-10"></div>
-            </div>
 
-            <img className="w-full h-auto" alt="Logo row" src="/logo-row.png" />
+                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">We bring free, high-quality medical care to underserved communities. Through mobile clinics, health education, and essential treatment programs, we help people live healthier, stronger lives.</h2>
+            </div>
         </div>
     </section>
 
     {/* <!-- Services Section --> */}
-    <section id="services" className="relative w-full bg-yellow-light py-[147px] mt-[74px]">
+    <section id="services" className="relative w-full bg-yellow-300 py-[147px] mt-[74px]">
         <div className="max-w-[1500px] mx-auto px-[206px]">
-            <div className="flex items-start gap-[244px]">
+            <div className="flex items-start gap-[80px]">
                 <div className="flex-1 flex flex-col gap-[32px]">
                     <div className="flex flex-col gap-4">
-                        <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">
-                            Some services we provide for our children
-                        </h2>
+                        <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">How You Can Help</h2>
                         <p className="text-secondary-text text-base tracking-[0] leading-[160%]">
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                             Suspendisse varius enim in eros elementum tristique.
@@ -118,42 +100,32 @@ export default function Home() {
 
                         <div className="flex flex-col gap-[24px]">
                             <div className="flex gap-4">
-                                <img className="w-7 h-7 flex-shrink-0" alt="Family support" src="/icon-3.png" />
+                                {/* <img className="w-7 h-7 flex-shrink-0" alt="Family support" src="/icon-3.png" /> */}
                                 <div className="flex flex-col gap-[10px]">
                                     <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">
-                                        Family support
+                                        Donate
                                     </h3>
-                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.
-                                    </p>
+                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">Your generous donation ensures that we can provide medical supplies, hire trained professionals, and operate mobile clinics in underserved areas.</p>
                                 </div>
                             </div>
 
                             <div className="flex gap-4">
-                                <img className="w-7 h-7 flex-shrink-0" alt="Health benefits" src="/icon-2.png" />
+                                {/* <img className="w-7 h-7 flex-shrink-0" alt="Health benefits" src="/icon-2.png" /> */}
                                 <div className="flex flex-col gap-[10px]">
-                                    <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">
-                                        Health benefits
-                                    </h3>
-                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.
-                                    </p>
+                                    <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">Volunteer</h3>
+                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">We rely on volunteers from all over the world. Your skills, time, and heart can change lives.</p>
                                 </div>
                             </div>
 
                             <div className="flex gap-4">
-                                <img className="w-7 h-7 flex-shrink-0" alt="Scholarships" src="/icon-1.png" />
+                                {/* <img className="w-7 h-7 flex-shrink-0" alt="Scholarships" src="/icon-1.png" /> */}
                                 <div className="flex flex-col gap-[10px]">
-                                    <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">
-                                        Scholarships
-                                    </h3>
-                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.
-                                    </p>
+                                    <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">Spread the Word</h3>
+                                    <p className="text-secondary-text text-base tracking-[0] leading-[160%] max-w-[384px]">Help raise awareness about our mission. Share our story and help us grow our community of supporters.</p>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            {/* <div className="flex gap-4">
                                 <img className="w-7 h-7 flex-shrink-0" alt="Therapy" src="/icon.png" />
                                 <div className="flex flex-col gap-[10px]">
                                     <h3 className="font-bold text-primary-text text-2xl tracking-[0] leading-[normal]">
@@ -163,24 +135,16 @@ export default function Home() {
                                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.
                                     </p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
 
                 <div className="flex-shrink-0">
-                    <img className="w-[480px] h-[658px] rounded-[20px] object-cover" alt="Child" src="/unsplash-sbiak0pkuie.png" />
+                    <img className="w-[480px] h-[500px] rounded-[20px] object-cover" alt="Child" src="/assets/images/child-care.png" />
                 </div>
             </div>
-
-            <div className="absolute left-[206px] top-0 flex items-center justify-center h-[212px] -rotate-90 origin-top-left">
-                <div className="flex items-center gap-6">
-                    <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
-                        WHAT WE DO
-                    </div>
-                    <div className="w-[72px] h-0.5 bg-primary-text"></div>
-                </div>
-            </div>
+            
         </div>
     </section>
 
@@ -194,7 +158,7 @@ export default function Home() {
                             PROJECTS WE HAVE DONE
                         </div>
                     </div>
-                    <div className="w-[72px] h-0.5 bg-primary-text"></div>
+                    <div className="w-[72px] h-0.5 bg-gray-500"></div>
                 </div>
 
                 <h2 className="max-w-[640px] font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">
@@ -204,7 +168,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Mission smile 1k" src="/unsplash-cveoh-jjmee-1.png" />
+                    <img className="absolute inset-0 w-full h-full object-cover" alt="Mission smile 1k" src="/assets/images/child-care.png" />
                     <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
                     <div className="absolute top-20 left-12 w-[319px] h-[293px] flex flex-col">
                         <div className="w-[315px] h-[84px] font-bold text-white text-[28px] tracking-[0] leading-[150%]">
@@ -222,7 +186,7 @@ export default function Home() {
                 </div>
 
                 <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Weekly excursions" src="/unsplash-iigovkrty8g.png" />
+                    <img className="absolute inset-0 w-full h-full object-cover" alt="Weekly excursions" src="/assets/images/about-us.png" />
                     <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
                     <div className="absolute top-20 left-12 w-[319px] h-[293px] flex flex-col">
                         <div className="w-[315px] h-[42px] font-bold text-white text-[28px] tracking-[0] leading-[150%]">
@@ -240,7 +204,7 @@ export default function Home() {
                 </div>
 
                 <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Monthly public awareness" src="/unsplash-1-aa2fadydc.png" />
+                    <img className="absolute inset-0 w-full h-full object-cover" alt="Monthly public awareness" src="/assets/images/medical-camp.png" />
                     <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
                     <div className="absolute top-20 left-12 w-[319px] h-[293px] flex flex-col">
                         <div className="w-[315px] h-[84px] font-bold text-white text-[28px] tracking-[0] leading-[150%]">
@@ -320,10 +284,7 @@ export default function Home() {
 
                     <div className="absolute top-0 left-[33.07%] flex items-center">
                         <span className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">
-                            largerthan
-                        </span>
-                        <span className="font-normal text-white text-[25px] tracking-[0] leading-[44px] whitespace-nowrap">
-                            i
+                            ACCS
                         </span>
                     </div>
                 </div>
@@ -332,14 +293,15 @@ export default function Home() {
     </section>
 
     {/* <!-- Call to Action Section --> */}
-    <section className="relative w-full h-96 flex items-center justify-center bg-[url(/unsplash-cveoh-jjmee.png)] bg-cover bg-center">
-        <div className="flex flex-col items-center gap-8 px-4 max-w-[807px]">
+    <section className="relative py-24 w-full flex items-center justify-center bg-[url(/assets/images/Donor-Focused-Version.png)] bg-cover bg-center">
+        <div className="inset-0 bg-opacity-50 bg-black absolute"></div>
+        <div className="flex flex-col items-center gap-8 px-4 max-w-5xl relative">
             <h2 className="font-bold text-white text-[48px] text-center tracking-[0] leading-[120%]">
-                You can contribute to provide a place for children with special needs!
+                Your generosity makes it possible for us to build a healing space that delivers specialized medical care and support to children with special needs.
             </h2>
 
             <div className="flex gap-8">
-                <button className="h-auto px-8 py-4 bg-yellow hover:opacity-90 text-[#000000] font-medium text-base rounded backdrop-blur-2xl backdrop-brightness-[100%]">
+                <button className="h-auto px-8 py-4 bg-yellow-500 hover:opacity-90 text-[#000000] font-medium text-base rounded backdrop-blur-2xl backdrop-brightness-[100%]">
                     Join as a volunteer
                 </button>
 
@@ -361,7 +323,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-yellow rounded-[20px] p-10">
+                <div className="bg-yellow-500 rounded-[20px] p-10">
                     <div className="flex items-start gap-5">
                         <div className="flex flex-col">
                             <div className="font-medium text-primary-text text-5xl tracking-[0] leading-[57.6px] whitespace-nowrap">
@@ -384,11 +346,11 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <img className="w-14 h-14 mt-8 flex-shrink-0" alt="Arrow button" src="/arrow-button-1.png" />
+                        <img className="w-14 h-14 mt-8 flex-shrink-0" alt="Arrow button" src="/assets/images/arrow-button.png" />
                     </div>
                 </div>
 
-                <div className="bg-yellow rounded-[20px] p-10">
+                <div className="bg-yellow-500 rounded-[20px] p-10">
                     <div className="flex items-start gap-5">
                         <div className="flex flex-col">
                             <div className="font-medium text-primary-text text-5xl tracking-[0] leading-[57.6px] whitespace-nowrap">
@@ -411,7 +373,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <img className="w-14 h-14 mt-8 flex-shrink-0" alt="Arrow button" src="/arrow-button.png" />
+                        <img className="w-14 h-14 mt-8 flex-shrink-0" alt="Arrow button" src="/assets/images/arrow-button.png" />
                     </div>
                 </div>
             </div>
