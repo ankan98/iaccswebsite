@@ -13,6 +13,7 @@ export default function About() {
             </div>
         </div>
     </header>
+    
     <section className="w-full flex flex-col gap-16 py-16 px-[110px]">
         <div className="w-full flex gap-[82px]">
             <div className="flex-1 flex flex-col gap-8 relative">
@@ -41,6 +42,109 @@ export default function About() {
 
             <div className="w-[480px] flex-shrink-0">
                 <img className="w-full h-auto" alt="Video" src="/assets/images/about-us.png" />
+            </div>
+        </div>
+    </section>
+
+    <section className="w-full flex flex-col gap-16 py-16 px-[110px] bg-yellow-500">
+        <div className="w-full flex gap-[82px]">
+            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+
+                <div className="flex justify-center">
+                    <img 
+                        src="https://img.freepik.com/free-photo/smiling-elderly-male-near-plant_23-2148036681.jpg" 
+                        alt="Chairman"
+                        className="rounded-xl shadow-lg object-cover"
+                    />
+                </div>
+
+                <div>
+                    <p className="text-yellow-100 font-semibold uppercase tracking-wide mb-2">
+                        Chairman’s Desk
+                    </p>
+
+                    <h2 className="text-4xl font-bold mb-4">
+                        Message From Our Chairman
+                    </h2>
+
+                    <p className="leading-relaxed mb-6">
+                        Our vision is to create a future where innovation and dedication come 
+                        together to achieve excellence. We believe in empowering people, embracing 
+                        new opportunities, and continuously pushing boundaries to bring meaningful 
+                        change to society.
+                    </p>
+
+                    <div>
+                        <h3 className="text-xl font-semibold">Mr. John Anderson</h3>
+                        <p className="text-yellow-900">Chairman & Founder</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section className="w-full flex flex-col gap-16 py-16 px-[110px]">
+        <div className="w-full flex gap-[82px]">
+            <div className="flex-1 flex flex-col gap-8 relative">
+                <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-[72px] h-0.5 bg-primary-text"></div>
+                        <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
+                            Meet Our Creative Team
+                        </div>
+                    </div>
+                </div>
+
+                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
+
+                <p className="text-secondary-text text-base tracking-[0] leading-[160%]">
+                    We are a group of passionate designers, developers, and creators dedicated to building digital experiences that inspire. Our team works together with innovation and commitment to bring meaningful ideas to life.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+
+                    <div className="bg-white p-6 rounded-xl text-center">
+                        <img
+                        src="https://img.freepik.com/free-photo/young-handsome-man-wearing-casual-tshirt-blue-background-happy-face-smiling-with-crossed-arms-looking-camera-positive-person_839833-12963.jpg"
+                        alt="team member"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        />
+                        <h3 className="text-xl font-semibold mt-4">John Doe</h3>
+                        <p className="text-gray-600">Web Developer</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl text-center">
+                        <img
+                        src="https://img.freepik.com/free-photo/people-smiling-men-handsome-cheerful_1187-6057.jpg"
+                        alt="team member"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        />
+                        <h3 className="text-xl font-semibold mt-4">Sarah Smith</h3>
+                        <p className="text-gray-600">UI/UX Designer</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl text-center">
+                        <img
+                        src="https://img.freepik.com/free-photo/front-view-lovely-smiley-woman_23-2148493038.jpg"
+                        alt="team member"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        />
+                        <h3 className="text-xl font-semibold mt-4">Marina Lee</h3>
+                        <p className="text-gray-600">Project Manager</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl text-center">
+                        <img
+                        src="https://img.freepik.com/free-photo/handsome-bearded-businessman-rubbing-hands-having-deal_176420-18778.jpg"
+                        alt="team member"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        />
+                        <h3 className="text-xl font-semibold mt-4">Shone Lee</h3>
+                        <p className="text-gray-600">Project Manager</p>
+                    </div>
+
+                </div>
             </div>
         </div>
     </section>
