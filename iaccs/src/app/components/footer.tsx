@@ -2,7 +2,7 @@
 
 export default function Footer() {
   return (
-  <footer id="contact" className="relative w-full bg-black py-[86px] px-[110px]">
+  <footer id="contact" className="relative w-full bg-black xl:py-[86px] py-10 xl:px-[110px] md:px-20 px-5">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 justify-between items-start">
             <div className="flex items-start gap-1">
                 <div className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">

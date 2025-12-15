@@ -9,7 +9,7 @@ export default function About() {
         <div className="container mx-auto px-[110px] relative z-[1]">
             <div className="w-full max-w-[642px] flex flex-col gap-12">
                 <h1 className="w-full max-w-[640px] font-bold text-white text-[64px] tracking-[0] leading-[76.8px]">About Us</h1>
-                <p className="text-lg text-white">Join us in providing life-saving medical care to communities without access to the basic healthcare they need.</p>
+                {/* <p className="text-lg text-white">Join us in providing life-saving medical care to communities without access to the basic healthcare they need.</p> */}
             </div>
         </div>
     </header>
@@ -17,32 +17,39 @@ export default function About() {
     <section className="w-full flex flex-col gap-16 py-16 px-[110px]">
         <div className="w-full flex gap-[82px]">
             <div className="flex-1 flex flex-col gap-8 relative">
-                <div className="flex items-center gap-8">
+                {/* <div className="flex items-center gap-8">
                     <div className="flex items-center gap-4">
                         <div className="w-[72px] h-0.5 bg-primary-text"></div>
                         <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
-                            Know About Us
+                            About Us
                         </div>
                     </div>
+                </div> */}
+
+                <h2 className="font-bold text-primary-text xl:text-[48px] md:text-3xl text-2xl">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
+
+                <div className="space-y-4">
+                    <p>The Association for Critical Care Sciences (ACCS) was founded to represent, strengthen, and advance the discipline of Critical Care Sciences in India. </p>
+
+                    <p>With a rapidly evolving healthcare landscape and an increasing demand for advanced critical care professionals, our association serves as a unified platform for students, educators, researchers, healthcare institutions, and practicing professionals working in critical and emergency care environments.</p>
+
+                    <p>Critical Care Sciences has been a part of formal healthcare education in India for over two decades through Diploma, Bachelor’s, and Master’s level programs offered by recognized universities and medical institutions. Despite the significant clinical contribution of Critical Care professionals—especially in ICUs, emergency services, trauma units, ventilatory management, invasive monitoring, and life-support systems—the discipline still lacks standardized 
+                    national recognition, legal identity, and regulatory framework. This gap has resulted in challenges related to employment, professional designation, licensure, and academic growth.</p>
+
+                    <p>ACCS was formed with the aim of addressing these challenges and enabling systemic reform. We advocate for national recognition under the NCAHP Act, standardized curriculum and training protocols, formal registration pathways, and defined career structures aligned with global medical education norms.</p>
+
+                    <p>Our mission extends beyond representation—we seek to build a professional ecosystem that encourages excellence in clinical skills, research, ethics, safety, leadership, and patient-centered care.</p>
+
+                    <p>As an association, we work to foster collaboration between healthcare delivery systems, universities, government authorities, regulatory bodies, and industry stakeholders. We actively promote continuing medical education, skill development programs, workshops, conferences, clinical exposure, andresearch initiatives to strengthen competency and enhance the quality of critical care services across India.</p>
+
+                    <p>At our core, we believe that recognition is not only a matter of identity—it is a matter of patient safety, system accountability, and national healthcare progress. Critical Care professionals are often the first line of response when a patient’s life hangs in balance. Their expertise is indispensable to modern health systems, and their role deserves the regulatory foundation, respect, and structure that aligns with their contribution.</p>
+                    
+                    <p>ACCS stands as a voice, a movement, and a commitment—dedicated to advancing the future of Critical Care Sciences and ensuring that every professional in this field receives the dignity, clarity, and opportunities they rightfully deserve.</p>
                 </div>
 
-                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
-
-                <p className="text-secondary-text text-base tracking-[0] leading-[160%]">
-                    We are a global non-profit dedicated to providing free healthcare to underserved populations. From remote villages to disaster zones, we’re committed to making healthcare accessible to everyone.
-                    posuere.
-                </p>
-
-                <div>
-                    <button className="bg-yellow-500 hover:opacity-90 text-black font-medium text-base px-8 py-4 rounded h-auto">
-                        Learn more
-                    </button>
-                </div>
+                
             </div>
 
-            <div className="w-[480px] flex-shrink-0">
-                <img className="w-full h-auto" alt="Video" src="/assets/images/about-us.png" />
-            </div>
         </div>
     </section>
 
@@ -86,32 +93,18 @@ export default function About() {
 
     <section className="w-full flex flex-col gap-16 py-16 px-[110px]">
         <div className="w-full flex gap-[82px]">
-            <div className="flex-1 flex flex-col gap-8 relative">
-                <div className="flex items-center gap-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-[72px] h-0.5 bg-primary-text"></div>
-                        <div className="font-bold text-primary-text text-base tracking-[2.00px] leading-[normal] whitespace-nowrap">
-                            Meet Our Creative Team
-                        </div>
-                    </div>
-                </div>
-
-                <h2 className="font-bold text-primary-text text-[48px] tracking-[0] leading-[120%]">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
-
-                <p className="text-secondary-text text-base tracking-[0] leading-[160%]">
-                    We are a group of passionate designers, developers, and creators dedicated to building digital experiences that inspire. Our team works together with innovation and commitment to bring meaningful ideas to life.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-
+            <div className="flex-1 flex flex-col gap-8 relative text-center">
+                <h2 className="font-bold text-primary-text xl:text-[48px] md:text-3xl text-2xl">Our Governing Members</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     <div className="bg-white p-6 rounded-xl text-center">
                         <img
                         src="https://img.freepik.com/free-photo/young-handsome-man-wearing-casual-tshirt-blue-background-happy-face-smiling-with-crossed-arms-looking-camera-positive-person_839833-12963.jpg"
                         alt="team member"
                         className="w-48 h-48 mx-auto rounded-xl object-cover"
                         />
-                        <h3 className="text-xl font-semibold mt-4">John Doe</h3>
-                        <p className="text-gray-600">Web Developer</p>
+                        <h3 className="text-xl font-semibold mt-4">BAPAN SARKAR</h3>
+                        <p className="text-gray-600">PRESIDENT</p>
+                        <p>MSc. CCS </p>
                     </div>
 
                     <div className="bg-white p-6 rounded-xl text-center">
@@ -120,8 +113,9 @@ export default function About() {
                         alt="team member"
                         className="w-48 h-48 mx-auto rounded-xl object-cover"
                         />
-                        <h3 className="text-xl font-semibold mt-4">Sarah Smith</h3>
-                        <p className="text-gray-600">UI/UX Designer</p>
+                        <h3 className="text-xl font-semibold mt-4">ATRI BANERJEE</h3>
+                        <p className="text-gray-600">GENERA SECRETARY</p>
+                        <p>BSc. CCT</p>
                     </div>
 
                     <div className="bg-white p-6 rounded-xl text-center">
@@ -130,18 +124,9 @@ export default function About() {
                         alt="team member"
                         className="w-48 h-48 mx-auto rounded-xl object-cover"
                         />
-                        <h3 className="text-xl font-semibold mt-4">Marina Lee</h3>
-                        <p className="text-gray-600">Project Manager</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-xl text-center">
-                        <img
-                        src="https://img.freepik.com/free-photo/handsome-bearded-businessman-rubbing-hands-having-deal_176420-18778.jpg"
-                        alt="team member"
-                        className="w-48 h-48 mx-auto rounded-xl object-cover"
-                        />
-                        <h3 className="text-xl font-semibold mt-4">Shone Lee</h3>
-                        <p className="text-gray-600">Project Manager</p>
+                        <h3 className="text-xl font-semibold mt-4">TRINA GHORAI </h3>
+                        <p className="text-gray-600">VICE PRESIDENT</p>
+                        <p>BSc. CCT</p>
                     </div>
 
                 </div>
