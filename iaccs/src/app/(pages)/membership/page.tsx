@@ -17,28 +17,28 @@ export default function Membership() {
         "Monthly updates",
       ],
     },
-    {
-      title: "Premium",
-      price: 19,
-      desc: "Best value for professionals",
-      features: [
-        "All Basic features",
-        "Priority support",
-        "Bonus resources",
-        "Weekly updates",
-      ],
-    },
-    {
-      title: "Enterprise",
-      price: 49,
-      desc: "Complete solution for teams",
-      features: [
-        "All Premium features",
-        "Dedicated manager",
-        "Custom integrations",
-        "Unlimited resources",
-      ],
-    },
+    // {
+    //   title: "Premium",
+    //   price: 19,
+    //   desc: "Best value for professionals",
+    //   features: [
+    //     "All Basic features",
+    //     "Priority support",
+    //     "Bonus resources",
+    //     "Weekly updates",
+    //   ],
+    // },
+    // {
+    //   title: "Enterprise",
+    //   price: 49,
+    //   desc: "Complete solution for teams",
+    //   features: [
+    //     "All Premium features",
+    //     "Dedicated manager",
+    //     "Custom integrations",
+    //     "Unlimited resources",
+    //   ],
+    // },
   ];
 
   const handleChoosePlan = (planName: any) => {
