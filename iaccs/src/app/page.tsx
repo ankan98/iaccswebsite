@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -17,9 +18,9 @@ export default function Home() {
 
                 <div className="flex gap-6">
                     <button className="h-auto px-8 py-4 bg-white text-primary-text hover:bg-opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                        <span className="font-medium text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
+                        <Link href="/membership" className="font-medium text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                             Volunteer Today
-                        </span>
+                        </Link>
                     </button>
 
                     {/* <button className="inline-flex w-[140px] h-12 items-center justify-center gap-2 px-4 py-3 bg-transparent hover:opacity-80 transition-opacity">
@@ -59,9 +60,9 @@ export default function Home() {
                 <p>A future where Critical Care Science is nationally recognized, standardized, and valued as an essential healthcare specialty supported by strong academic pathways, ethical practice, and professional dignity.</p>
 
                 <div>
-                    <button className="bg-yellow-500 hover:opacity-90 text-black font-medium text-base px-8 py-4 rounded h-auto">
+                    <Link href="/about-us" className="bg-yellow-500 hover:opacity-90 text-black font-medium text-base px-8 py-4 rounded h-auto">
                         Learn more
-                    </button>
+                    </Link>
                 </div>
             </div>
 
@@ -109,9 +110,9 @@ export default function Home() {
                             Working toward the official recognition of Critical Care Science under national healthcare frameworks. We collaborate with policymakers, institutions, and stakeholders to secure professional identity and rights
                         </div>
                         <button className="w-[146px] h-auto mt-[64px] px-8 py-4 bg-white hover:opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                            <span className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
+                            <Link href="/about-us" className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                                 Learn more
-                            </span>
+                            </Link>
                         </button>
                     </div>
                 </div>
@@ -127,9 +128,9 @@ export default function Home() {
                             Helping students and professionals enhance their knowledge and hands-on ICU
                         </div>
                         <button className="w-[146px] h-auto mt-[106px] px-8 py-4 bg-white hover:opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                            <span className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
+                            <Link href="/about-us" className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                                 Learn more
-                            </span>
+                            </Link>
                         </button>
                     </div>
                 </div>
@@ -145,9 +146,9 @@ export default function Home() {
                             Providing structured learning materials, mentorship, and access to essential educational resources for students and practicing professionals in critical care domains
                         </div>
                         <button className="w-[146px] h-auto mt-[64px] px-8 py-4 bg-white hover:opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                            <span className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
+                            <Link href="/about-us" className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                                 Learn more
-                            </span>
+                            </Link>
                         </button>
                     </div>
                 </div>
@@ -166,9 +167,9 @@ export default function Home() {
                         </h2>
 
                         <button className="w-[146px] h-auto px-8 py-4 bg-white hover:opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                            <span className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
+                            <Link href="/membership" className="font-medium text-primary-text text-base text-right tracking-[0] leading-[normal] whitespace-nowrap">
                                 Join Us
-                            </span>
+                            </Link>
                         </button>
                     </div>                    
                 </div>
@@ -232,7 +233,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="mt-[27px] font-bold text-primary-text text-[28px] tracking-[0] leading-[150%]">
-                                A day with our wonderful children
+                                Coming Soon...
                             </div>
                         </div>
 
@@ -259,7 +260,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="mt-[27px] font-bold text-primary-text text-[28px] tracking-[0] leading-[150%]">
-                                Seminar: Caring for children with autism
+                                Coming Soon...
                             </div>
                         </div>
 

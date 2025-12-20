@@ -114,7 +114,7 @@ export default function About() {
                         className="w-48 h-48 mx-auto rounded-xl object-cover border border-gray-200"
                         />
                         <h3 className="text-xl font-semibold mt-4">ATRI BANERJEE</h3>
-                        <p className="text-gray-600">GENERA SECRETARY</p>
+                        <p className="text-gray-600">GENERAL SECRETARY</p>
                         <p>BSc. CCT</p>
                     </div>
 
