@@ -26,7 +26,7 @@ export default function About() {
                     </div>
                 </div> */}
 
-                <h2 className="font-bold text-primary-text xl:text-[48px] md:text-3xl text-2xl">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
+                <h2 className="font-bold text-primary-text xl:text-[48px] md:text-3xl text-2xl !leading-tight">Delivering Free Healthcare to Underserved Communities Worldwide</h2>
 
                 <div className="space-y-4">
                     <p>The Association for Critical Care Sciences (ACCS) was founded to represent, strengthen, and advance the discipline of Critical Care Sciences in India. </p>
@@ -53,7 +53,7 @@ export default function About() {
         </div>
     </section>
 
-    <section className="w-full flex flex-col gap-16 py-16 px-[110px] bg-yellow-500">
+    {/* <section className="w-full flex flex-col gap-16 py-16 px-[110px] bg-yellow-500">
         <div className="w-full flex gap-[82px]">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
 
@@ -89,7 +89,7 @@ export default function About() {
 
             </div>
         </div>
-    </section>
+    </section> */}
 
     <section className="w-full flex flex-col gap-16 py-16 px-[110px]">
         <div className="w-full flex gap-[82px]">
@@ -98,9 +98,9 @@ export default function About() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     <div className="bg-white p-6 rounded-xl text-center">
                         <img
-                        src="https://img.freepik.com/free-photo/young-handsome-man-wearing-casual-tshirt-blue-background-happy-face-smiling-with-crossed-arms-looking-camera-positive-person_839833-12963.jpg"
+                        src="assets/images/male-placeholder.jpg"
                         alt="team member"
-                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover border border-gray-200"
                         />
                         <h3 className="text-xl font-semibold mt-4">BAPAN SARKAR</h3>
                         <p className="text-gray-600">PRESIDENT</p>
@@ -109,9 +109,9 @@ export default function About() {
 
                     <div className="bg-white p-6 rounded-xl text-center">
                         <img
-                        src="https://img.freepik.com/free-photo/people-smiling-men-handsome-cheerful_1187-6057.jpg"
+                        src="assets/images/male-placeholder.jpg"
                         alt="team member"
-                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover border border-gray-200"
                         />
                         <h3 className="text-xl font-semibold mt-4">ATRI BANERJEE</h3>
                         <p className="text-gray-600">GENERA SECRETARY</p>
@@ -120,9 +120,9 @@ export default function About() {
 
                     <div className="bg-white p-6 rounded-xl text-center">
                         <img
-                        src="https://img.freepik.com/free-photo/front-view-lovely-smiley-woman_23-2148493038.jpg"
+                        src="assets/images/female-placeholder.jpg"
                         alt="team member"
-                        className="w-48 h-48 mx-auto rounded-xl object-cover"
+                        className="w-48 h-48 mx-auto rounded-xl object-cover border border-gray-200"
                         />
                         <h3 className="text-xl font-semibold mt-4">TRINA GHORAI </h3>
                         <p className="text-gray-600">VICE PRESIDENT</p>

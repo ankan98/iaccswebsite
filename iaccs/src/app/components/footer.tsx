@@ -3,34 +3,35 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-  <footer id="contact" className="relative w-full bg-black xl:py-[86px] py-10 xl:px-[110px] md:px-20 px-5">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 justify-between items-start">
-            <div className="flex items-start gap-1">
+  <footer id="contact" className="relative w-full bg-black xl:py-14 py-10 xl:px-[110px] md:px-20 px-5">
+        <div className="flex flex-col gap-8 justify-between items-center">
+            <div className="flex items-center gap-1">
                 <div className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">
-                    <img src="/iaccslogo.jpg" alt=""  />
+                    <img src="/iaccslogo.png" alt="Iaccslogo" width={100} height={100} />
                 </div>
             </div>
 
-            <nav className="flex gap-12 lg:gap-16">
-                <div className="flex flex-col gap-6">
+            <nav className="w-full flex flex-wrap justify-between items-center gap-4">
+                <div className="flex flex-wrap gap-6">
                     <Link href="/" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Home
                     </Link>
-                    <Link href="/about-us" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    <Link href="/about-us" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         About us
                     </Link>
                   
-                    <Link href="/contact-us" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    <Link href="/contact-us" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Contact
                     </Link>
                 </div>
 
              
 
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-wrap items-center gap-6">
                     <div className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Connect
                     </div>
+<div className="flex flex-wrap justify-center gap-6">
                     <a href="https://www.facebook.com/share/1Eujhyvcd1/"  target="_blank"
   rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Facebook
@@ -44,6 +45,7 @@ export default function Footer() {
   rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Linkdin
                     </a>
+                    </div>
                 </div>
             </nav>
 

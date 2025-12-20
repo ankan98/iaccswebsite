@@ -12,7 +12,7 @@ export default function Header() {
       <nav className="fixed top-0 left-0 z-[9] flex w-full items-center justify-between border-b border-[#00000066] bg-white px-6 py-4 backdrop-blur-[15px] md:px-[110px]">
         {/* Logo */}
         <Link href="/" className="text-3xl font-bold text-black">
-          <img src="/iaccslogo.jpg" alt="" />
+          <img src="/iaccslogo.png" alt="Iaccslogo" width={100} height={100} />
         </Link>
 
         {/* Desktop Menu */}
