@@ -39,12 +39,12 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="">
+                {/* <div className="">
                   <h3 className="text-lg font-semibold mb-3">Find Us On Map</h3>
                   <div className="w-full h-64 xl:h-96 bg-gray-300 rounded-lg flex items-center justify-center">
                     <span className="text-gray-600">Google Map Placeholder</span>
                   </div>
-                </div>
+                </div> */}
 
               </div>
             </div>

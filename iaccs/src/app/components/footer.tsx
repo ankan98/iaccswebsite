@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 
 export default function Footer() {
@@ -6,67 +7,47 @@ export default function Footer() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 justify-between items-start">
             <div className="flex items-start gap-1">
                 <div className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">
-                    ACCS
+                    <img src="/iaccslogo.jpg" alt=""  />
                 </div>
             </div>
 
             <nav className="flex gap-12 lg:gap-16">
                 <div className="flex flex-col gap-6">
-                    <a href="#" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    <Link href="/" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Home
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    </Link>
+                    <Link href="/about-us" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         About us
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Team
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        What we do
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    </Link>
+                  
+                    <Link href="/contact-us" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Contact
-                    </a>
+                    </Link>
                 </div>
 
-                <div className="flex flex-col gap-6">
-                    <a href="#" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        More
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Projects
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Events
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Donate
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Blog
-                    </a>
-                </div>
+             
 
                 <div className="flex flex-col gap-6">
-                    <a href="#" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    <div className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Connect
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    </div>
+                    <a href="https://www.facebook.com/share/1Eujhyvcd1/"  target="_blank"
+  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Facebook
                     </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    <a href="https://www.instagram.com/accs_india?igsh=cHh0d2ZsN3U1MWhr"  target="_blank"
+  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Instagram
                     </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Twitter
-                    </a>
-                    <a href="#" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
+                    
+                    <a href="https://www.linkedin.com/company/iaccs-india/"  target="_blank"
+  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
                         Linkdin
                     </a>
                 </div>
             </nav>
 
-            <div className="flex flex-col gap-8 max-w-[546px] w-full">
+            {/* <div className="flex flex-col gap-8 max-w-[546px] w-full">
                 <h2 className="font-bold text-white text-[40px] tracking-[0] leading-[56px]">
                     Subscribe to get latest updates
                 </h2>
@@ -81,7 +62,7 @@ export default function Footer() {
                         Subscribe
                     </button>
                 </div>
-            </div>
+            </div> */}
         </div>
     </footer>
   );
