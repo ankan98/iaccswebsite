@@ -946,7 +946,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...props}
-          className={`w-full px-4 py-3 text-gray-800 bg-white border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
+          className={`w-full px-4 py-3 text-white bg-white border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -969,7 +969,7 @@ function Textarea({ label, error, ...props }: TextareaProps) {
       <Label>{label}</Label>
       <textarea
         {...props}
-        className={`w-full px-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none placeholder-gray-400 ${
+        className={`w-full px-4 py-3 text-white bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none placeholder-gray-400 ${
           error ? "border-red-500" : "border-gray-300"
         }`}
       />
