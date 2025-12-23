@@ -484,7 +484,7 @@ export default function Membership() {
             </div>
           </div>
 
-          <form ref={formRef} onSubmit={handleSubmit}>
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
             {/* PERSONAL INFORMATION */}
             <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
               <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
@@ -946,7 +946,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...props}
-          className={`w-full px-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
+          className={`w-full px-4 py-3 text-gray-800 bg-white border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />

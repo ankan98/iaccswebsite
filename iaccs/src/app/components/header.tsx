@@ -17,16 +17,16 @@ export default function Header() {
 
         {/* Desktop Menu */}
         <div className="hidden items-center gap-10 md:flex">
-          <Link className="font-medium text-[#525560]" href="/">
+          <Link className="font-medium text-gray-600 hover:text-blue-500" href="/">
             Home
           </Link>
-          <Link className="font-medium text-secondary-text" href="/about-us">
+          <Link className="font-medium text-gray-600 hover:text-blue-500" href="/about-us">
             About us
           </Link>
-          <Link className="font-medium text-secondary-text" href="/membership">
+          <Link className="font-medium text-gray-600 hover:text-blue-500" href="/membership">
             Membership
           </Link>
-          <Link className="font-medium text-secondary-text" href="/contact-us">
+          <Link className="font-medium text-gray-600 hover:text-blue-500" href="/contact-us">
             Contact
           </Link>
         </div>

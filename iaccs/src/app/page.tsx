@@ -11,10 +11,10 @@ export default function Home() {
         <div className="container mx-auto xl:px-[110px] md:px-20 px-5 relative z-[1]">
             <div className="w-full max-w-[642px] flex flex-col gap-12">
                 <div className="text-white">
-                    <h1 className="w-full max-w-[640px] font-bold text-white xl:text-[64px] md:text-4xl text-3xl tracking-[0] xl:leading-[76.8px]">Welcome to ACSS The Association for Critical Care Sciences</h1>
+                    <h1 className="w-full max-w-[640px] font-bold text-white xl:text-[64px] md:text-4xl text-3xl tracking-[0] xl:leading-[76.8px]">Welcome to ACCS The Association for Critical Care Sciences</h1>
                 <p>R ECOG N I T IO N . S TA N DARDS . E XCE L L E N CE .</p>
                 </div>
-                <p className="text-lg text-white">ACSS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession</p>
+                <p className="text-lg text-white">ACCS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession</p>
 
                 <div className="flex gap-6">
                     <button className="h-auto px-8 py-4 bg-white text-primary-text hover:bg-opacity-90 rounded backdrop-blur-2xl backdrop-brightness-[100%]">
@@ -51,7 +51,7 @@ export default function Home() {
 
                 <h2 className="font-bold text-primary-text xl:text-2xl md:text-xl text-lg tracking-[0] xl:leading-[120%]">MISSION & VISION</h2>
 
-                <p className="text-secondary-text text-base tracking-[0] leading-[160%]">The Association for Critical Care Sciences (ACSS) is a community-led initiative formed to represent, support, and advance the field of Critical Care Science in India. We work towards unifying students, graduates, educators, and professionals to strengthen recognition, create academic opportunities, and uphold high standards in clinical practice.</p>
+                <p className="text-secondary-text text-base tracking-[0] leading-[160%]">The Association for Critical Care Sciences (ACCS) is a community-led initiative formed to represent, support, and advance the field of Critical Care Science in India. We work towards unifying students, graduates, educators, and professionals to strengthen recognition, create academic opportunities, and uphold high standards in clinical practice.</p>
 
                 <h3 className="font-bold">MISSION & VISION</h3>
 
@@ -66,7 +66,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="w-[480px] flex-shrink-0">
+            <div className="md:w-[480px] md:flex-shrink-0">
                 <img className="w-full h-auto" alt="Video" src="/assets/images/about-us.png" />
             </div>
         </div>
