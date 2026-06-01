@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IACCS Membership Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f4f6f8; }
+        .container { max-width: 900px; margin: 30px auto; background:#fff; padding: 20px; border-radius: 6px; }
+        h2 { background:#2c3e50; color:#fff; padding:10px; }
+        h3 { margin-top:25px; color:#2c3e50; }
+        label { display:block; margin-top:10px; font-weight:bold; }
+        input, select, textarea { width:100%; padding:8px; margin-top:5px; }
+        textarea { resize: vertical; }
+        .row { display:flex; gap:15px; }
+        .row > div { flex:1; }
+        .submit-btn { margin-top:20px; background:#27ae60; color:#fff; padding:12px; border:none; font-size:16px; cursor:pointer; }
+        .submit-btn:hover { background:#219150; }
+        .note { font-size:13px; color:#555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>IACCS Membership Application Form</h2>
+
+
+<form id="membershipForm" action="membership_form_submit_new.php" method="POST" enctype="multipart/form-data">
+
+    <h3>Personal Details</h3>
+    <label>Name *</label>
+    <input type="text" name="name" required>
+
+    <label>Father / Husband Name *</label>
+    <input type="text" name="father_name" required>
+
+    <div class="row">
+        <div>
+            <label>Date of Birth *</label>
+            <input type="date" name="dob" required>
+        </div>
+        <div>
+            <label>Age</label>
+            <input type="number" name="age">
+        </div>
+    </div>
+
+    <label>Gender *</label>
+    <select name="gender" required>
+        <option value="">-- Select --</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+    </select>
+
+    <h3>Contact & Address</h3>
+    <label>Address *</label>
+    <textarea name="address" required></textarea>
+
+    <div class="row">
+        <div>
+            <label>City</label>
+            <input type="text" name="city">
+        </div>
+        <div>
+            <label>District</label>
+            <input type="text" name="district">
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <label>PIN</label>
+            <input type="text" name="pin">
+        </div>
+        <div>
+            <label>State</label>
+            <input type="text" name="state">
+        </div>
+    </div>
+
+    <label>Mobile *</label>
+    <input type="text" name="mobile" maxlength="10" required>
+
+    <label>Email *</label>
+    <input type="email" name="email" required>
+
+    <label>Nationality</label>
+    <input type="text" name="nationality" value="Indian">
+
+    <h3>Education Details</h3>
+    <label>Educational Qualification *</label>
+    <select name="education" required>
+        <option value="">-- Select --</option>
+        <option>Diploma</option>
+        <option>Bachelor</option>
+        <option>Masters</option>
+        <option>Doctorate</option>
+    </select>
+
+    <label>Education Status</label>
+    <select name="education_status">
+        <option>Pursuing</option>
+        <option>Completed</option>
+    </select>
+
+    <label>Academic Session</label>
+    <input type="text" name="academic_session" placeholder="2019-2022">
+
+    <label>College / Institution</label>
+    <input type="text" name="college_name">
+
+    <label>University</label>
+    <input type="text" name="university_name">
+
+    <h3>Employment Details</h3>
+    <label>Currently Employed</label>
+    <select name="employed">
+        <option>No</option>
+        <option>Yes</option>
+    </select>
+
+    <label>Employment Type</label>
+    <select name="employment_type">
+        <option value="">-- Select --</option>
+        <option>Govt</option>
+        <option>Private</option>
+    </select>
+
+    <label>Hospital / Institute</label>
+    <input type="text" name="hospital_name">
+
+    <label>Designation</label>
+    <input type="text" name="designation">
+
+    <label>Employee ID</label>
+    <input type="text" name="employee_id">
+
+    <h3>Membership</h3>
+    <label>Membership Plan *</label>
+    <select name="membership_plan" required>
+        <option value="">-- Select --</option>
+        <option value="student">Student (₹50)</option>
+        <option value="professional">Professional (₹100)</option>
+    </select>
+
+    <label>Amount *</label>
+    <input type="number" name="amount" required>
+
+    <h3>Upload Documents</h3>
+    <label>Photo (JPG/PNG, max 2MB) *</label>
+    <input type="file" name="photo" accept="image/jpeg,image/png" required>
+
+    <label>ID Proof (JPG/PNG/PDF) *</label>
+    <input type="file" name="id_proof" accept="image/jpeg,image/png,application/pdf" required>
+
+    <label>Education Qualification Document (Optional)</label>
+    <input type="file" name="education_doc" accept="image/jpeg,image/png,application/pdf">
+
+    <label>Student ID Card (Optional)</label>
+    <input type="file" name="student_id" accept="image/jpeg,image/png,application/pdf">
+
+    <label>Employment Proof (Optional)</label>
+    <input type="file" name="employment_proof" accept="image/jpeg,image/png,application/pdf">
+
+    <p class="note">Fields marked * are mandatory</p>
+
+    <button type="submit" class="submit-btn">Submit Application</button>
+
+</form>
+
+
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    const prices = {
+        'student': 50,
+        'professional': 100,
+        'enterprise': 200,
+    };
+
+    $('select[name="membership_plan"]').on('change', function() {
+        $('input[name="amount"]').val(prices[this.value] || '');
+    });
+
+    $('#membershipForm').on('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        
+        $.ajax({
+            url: 'membership_form_submit_new.php',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if (response.success) {
+                    if (response.redirect_url) {
+                        window.location.href = response.redirect_url;
+                    }
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred during submission.');
+            }
+        });
+    });
+</script>
+</body>
+</html>

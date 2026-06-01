@@ -1,0 +1,31 @@
+User-agent: *
+# Allow main site pages
+Allow: /
+
+# Block system & internal folders
+Disallow: /vendor/
+Disallow: /cgi-bin/
+Disallow: /.well-known/
+Disallow: /__MACOSX/
+
+# Block error & internal pages
+Disallow: /404/
+Disallow: /_not-found/
+
+# Block backend / action files
+Disallow: /*.php$
+Disallow: /membership-submission.php
+
+# Allow assets (images, CSS, JS)
+Allow: /assets/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.svg$
+Allow: /*.ico$
+
+# Sitemap (update URL if different)
+Allow: /sitemap.xml
+Sitemap: https://iaccs.org.in/sitemap.xml

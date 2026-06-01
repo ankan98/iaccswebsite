@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: 'dejavusans', helvetica, sans-serif; font-size: 11pt; color: #111827; }
+    .wrap { padding: 14px; }
+    .title { font-size: 20pt; font-weight: bold; }
+    .subtitle { font-size: 12pt; font-weight: bold; }
+    .line { border-top: 1px solid #111827; margin: 10px 0; }
+    .line-thick { border-top: 2px solid #111827; margin: 10px 0; }
+    .meta { font-size: 9.5pt; }
+    .addr { font-size: 9.5pt; text-align: center; }
+    .slip { text-align: center; text-decoration: underline; font-size: 18pt; font-weight: bold; letter-spacing: 0.5px;margin-bottom: 10px; }
+
+    .details { width: 100%; border-collapse: collapse; margin-top: 40px; }
+    .details td { padding: 8px 4px; vertical-align: top; }
+    .label { width: 45%; font-weight: bold;font-family: "Times New Roman";  font-size: 22px; }
+    .value { width: 55%;font-weight: bold;font-family: "Times New Roman";  font-size: 22px; }
+
+    .qrSig { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    .qrBox { width: 112px; height: 112px; border: 1px solid #111827; padding: 6px; }
+    .sigName { font-family: times, serif; font-style: italic; font-size: 18pt; text-align: center; }
+    .sigLine { border-top: 1px solid #111827; margin: 8px 28px 6px 28px; }
+    .sigRole { font-size: 9.5pt; font-weight: bold; text-align: center; }
+    .sigOrg { font-size: 9.5pt; text-align: center; }
+
+    .footer { font-size: 8.5pt; color: #111827; margin-top: 12px; line-height: 1.35; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="70" valign="middle">
+          <img src="{{LOGO_SRC}}" width="60" />
+        </td>
+        <td valign="middle">
+          <div class="title"><span>The Association for Critical Care Sciences</span></div>
+          <div class="subtitle"></div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="line-thick"></div>
+
+    <table class="meta" width="100%" cellpadding="0" cellspacing="0">
+      <tr >
+        <td align="center" style='border-right:1px solid #000; width: 33.33%;font-family: "Times New Roman";font-size: 20px;'>Registered as an AOP for regulatory purposes</td>
+        <td align="center" style='border-right:1px solid #000; width: 33.33%;font-family: "Times New Roman";font-size: 20px; '>www.iaccs.org.in</td>
+        <td align="center" style='width: 33.33%;font-family: "Times New Roman";font-size: 20px;'>admin@iaccs.org.in</td>
+      </tr>
+    </table>
+
+    <div class="addr" style='margin-top:8px;font-size: 20px;font-family: "Times New Roman";'>Address:- Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065</div>
+
+    <div class="line-thick"></div>
+
+    <div class="slip">E-VERIFICATION SLIP</div>
+
+    <table class="details" cellpadding="0" cellspacing="0">
+      <tr><td class="label">Name:-</td><td class="value">{{NAME}}</td></tr>
+      <tr><td class="label">Membership ID:-</td><td class="value">{{MEMBERSHIP_ID}}</td></tr>
+      <tr><td class="label">Membership Category:-</td><td class="value">{{MEMBERSHIP_CATEGORY}}</td></tr>
+      <tr><td class="label">Membership Status:-</td><td class="value">{{MEMBERSHIP_STATUS}}</td></tr>
+      <tr><td class="label">Qualification:-</td><td class="value">{{QUALIFICATION}}</td></tr>
+      <tr><td class="label">Email:-</td><td class="value">{{EMAIL}}</td></tr>
+      <tr><td class="label">Contact Number:-</td><td class="value">{{CONTACT_NUMBER}}</td></tr>
+      <tr><td class="label">Membership Type:-</td><td class="value">{{MEMBERSHIP_TYPE}}</td></tr>
+      <tr><td class="label">Payment Status:-</td><td class="value">{{PAYMENT_STATUS}}</td></tr>
+      <tr><td class="label" style="border-bottom:none;">Valid Until:-</td><td class="value" style="border-bottom:none;">{{VALID_UNTIL}}</td></tr>
+    </table>
+
+    <table class="qrSig" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="35%" valign="top">
+          <div class="qrBox"></div>
+        </td>
+        <td width="65%" valign="top">
+          <div class="sigName"><img src="assets/images/signature.png" alt="" width="200"></div>
+          <div class="sigLine"></div>
+          <div class="sigRole">Authorized Signatory (President)</div>
+          <div class="sigOrg">The Association for Critical Care Sciences</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <div class="footer">
+      This E-Verification Slip is issued solely for internal membership identification purposes by The Association for Critical Care Sciences, an independent non-statutory professional body. It does not constitute, imply, or confer any statutory recognition, regulatory approval, governmental affiliation, accreditation, professional licensure, academic qualification, certification, or legal authority of any nature whatsoever.<br/><br/>
+      The Association is not a government body, regulatory authority, licensing agency, statutory council, or accreditation board. This document shall not be used, presented, or relied upon as evidence of professional competence, clinical authorization, employment eligibility, academic equivalence, or legal entitlement.<br/><br/>
+      Any misuse, misrepresentation, alteration, or unauthorized reliance upon this document is strictly prohibited. The Association assumes no liability for any third-party interpretation or use of this E-Verification Slip beyond its intended internal identification purpose.
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+
+
