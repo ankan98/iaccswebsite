@@ -113,7 +113,16 @@ $frontend_url = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'loc
         <!-- Logo Area -->
         <div class="h-20 sm:h-22 flex items-center justify-between px-3 border-b border-slate-700/50 relative">
             <?php
-            $display_logo_src = !empty($cms_site_logo) ? ($cms_root . htmlspecialchars($cms_site_logo)) : 'http://localhost:8000/iaccslogo.png';
+            $display_logo_src = $cms_root . '../iaccslogo.png';
+            if (!empty($cms_site_logo)) {
+                $trimmed_logo = trim($cms_site_logo);
+                if (strpos($trimmed_logo, 'http://') === 0 || strpos($trimmed_logo, 'https://') === 0) {
+                    $display_logo_src = $trimmed_logo;
+                } else {
+                    $clean_logo = preg_replace('#^/?(cms/)?#i', '', $trimmed_logo);
+                    $display_logo_src = $cms_root . '../' . ltrim($clean_logo, '/');
+                }
+            }
             ?>
             <button type="button" onclick="openLogoLightbox('<?= $display_logo_src ?>')" class="flex-1 flex items-center justify-center py-1 group overflow-hidden focus:outline-none cursor-pointer" title="Click to view full site logo in lightbox">
                 <img src="<?= $display_logo_src ?>" class="h-14 sm:h-16 max-h-[64px] max-w-[210px] object-contain transition-transform group-hover:scale-105" alt="Site Logo">
