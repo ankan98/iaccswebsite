@@ -8,10 +8,16 @@ const rootBuildDir = path.join(projectRootDir, 'build');
 const frontendOutDir = path.join(frontendDir, 'out');
 const backendDir = path.join(projectRootDir, 'backend');
 
+const skipUploads = process.argv.includes('--no-uploads') || process.argv.includes('--skip-uploads');
+
 function copyRecursiveSync(src, dest) {
   if (!fs.existsSync(src)) return;
   const stats = fs.statSync(src);
   if (stats.isDirectory()) {
+    if (skipUploads && path.basename(src) === 'uploads') {
+      console.log(`⏩ Skipping ${src} (--no-uploads flag active)`);
+      return;
+    }
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
     }

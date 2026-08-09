@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "build-live": "node scripts/build-live.js",
+    "build-live:clean": "node scripts/build-live.js --no-uploads",
     "start": "next start",
     "lint": "eslint"
   },
