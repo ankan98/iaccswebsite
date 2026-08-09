@@ -13,8 +13,15 @@ export default function DynamicPageClient({ initialPageData, slug }: DynamicPage
   const [pageData, setPageData] = useState<any>(initialPageData);
 
   useEffect(() => {
+    let activeSlug = slug && slug !== "dynamic-page" ? slug : "";
+    if (!activeSlug && typeof window !== "undefined") {
+      activeSlug = window.location.pathname.replace(/^\/+|\/+$/g, "");
+    }
+
+    if (!activeSlug) return;
+
     const apiBase = getPhpBaseUrl();
-    fetch(`${apiBase}/get_page.php?slug=${encodeURIComponent(slug)}`)
+    fetch(`${apiBase}/get_page.php?slug=${encodeURIComponent(activeSlug)}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && !data.error) {

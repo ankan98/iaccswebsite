@@ -77,12 +77,7 @@ export default async function DynamicPage({ params }: PageProps) {
   const slug = resolvedParams.slug;
 
   if (slug === "dynamic-page") {
-    return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-5 mt-20">
-        <h1 className="text-xl font-bold text-gray-800 mb-2">Dynamic Content Area</h1>
-        <p className="text-gray-500 text-sm">Pre-rendered fallback template for database-driven pages.</p>
-      </div>
-    );
+    return <DynamicPageClient initialPageData={null} slug="" backendUrl={backendUrl} />;
   }
 
   const pageData = await getPageData(slug);
