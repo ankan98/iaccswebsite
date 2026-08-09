@@ -25,7 +25,7 @@ if ($cms_settings_res && $cms_settings_res->num_rows > 0) {
     }
 }
 
-$frontend_url = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1' || strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0)) ? 'http://localhost:8000' : 'https://iaccs.org.in';
+$frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['HTTP_HOST'])) ? ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']) : 'https://iaccs.org.in');
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">

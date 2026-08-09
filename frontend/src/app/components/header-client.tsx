@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { buildPhpUrl, resolveAssetUrl } from "@/app/lib/utils";
+import { buildPhpUrl, resolveAssetUrl, getPhpBaseUrl } from "@/app/lib/utils";
 
 interface SocialLink {
   image: string;
@@ -44,20 +44,21 @@ export default function HeaderClient({ settings, menuItems = [], backendUrl }: H
     if (settings) setCurrentSettings(settings);
     if (menuItems && menuItems.length > 0) setCurrentMenuItems(menuItems);
 
-    fetch(`${backendUrl}/get_settings.php`)
+    const apiBase = getPhpBaseUrl();
+    fetch(`${apiBase}/get_settings.php`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) setCurrentSettings(data);
       })
       .catch(() => {});
 
-    fetch(`${backendUrl}/get_menus.php?menu_id=1`)
+    fetch(`${apiBase}/get_menus.php?menu_id=1`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.items) setCurrentMenuItems(data.items);
       })
       .catch(() => {});
-  }, [backendUrl]);
+  }, [settings, menuItems]);
 
   const siteTitle       = currentSettings?.site_title       || "The Association for Critical Care Sciences";
   const siteTitleHindi  = currentSettings?.site_title_hindi || "दि एसोसिएशन फ़ॉर क्रिटिकल केयर साइंसेज़";

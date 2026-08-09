@@ -1,20 +1,16 @@
 export function getPhpBaseUrl(hostname?: string | null): string {
-  // 1. Check if configured in environment variables (works both in server/client if prefixed with NEXT_PUBLIC_)
-  if (process.env.NEXT_PUBLIC_PHP_BACKEND_URL) {
-    // Remove trailing slash if present
-    return process.env.NEXT_PUBLIC_PHP_BACKEND_URL.replace(/\/$/, "");
+  // 1. In browser environment: dynamically use current window.location.origin
+  if (typeof window !== "undefined") {
+    return window.location.origin;
   }
 
-  // 2. Resolve hostname: check provided parameter first, then fallback to window.location
-  const host = hostname || (typeof window !== "undefined" ? window.location.hostname : "");
-  if (host === "localhost" || host === "127.0.0.1") {
-    return "http://localhost:8000";
-  }
-  if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.org.in";
+  // 2. Read from environment variables (.env / .env.local)
+  const envUrl = process.env.NEXT_PUBLIC_PHP_BACKEND_URL || process.env.NEXT_PUBLIC_BASE_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/$/, "");
   }
 
-  // 3. Production fallback
+  // 3. Server-side / Build default fallback
   return "https://iaccs.org.in";
 }
 
@@ -46,27 +42,17 @@ export function resolveAssetUrl(url?: string | null, fallback: string = ""): str
   if (cleanPath.startsWith("uploads/") || cleanPath.startsWith("cms/uploads/")) {
     const uploadPath = cleanPath.replace(/^cms\//, ""); // strip accidental 'cms/' prefix
 
-    // If running in browser:
+    // If running in browser: return relative path from root
     if (typeof window !== "undefined") {
-      const host = window.location.hostname;
-      const port = window.location.port;
-
-      if (host === "localhost" || host === "127.0.0.1") {
-        if (port === "8000") {
-          // Serving directly from PHP/Static build on port 8000
-          return `/${uploadPath}`;
-        }
-        // Dev server on port 3000
-        return `http://localhost:8000/${uploadPath}`;
-      }
+      return `/${uploadPath}`;
     }
 
-    // Server-side or production fallback
-    const backendUrl = process.env.NEXT_PUBLIC_PHP_BACKEND_URL || "https://iaccs.org.in";
-    return `${backendUrl.replace(/\/$/, "")}/${uploadPath}`;
+    // Server-side build or SSR fallback from environment variable
+    const envUrl = process.env.NEXT_PUBLIC_PHP_BACKEND_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://iaccs.org.in";
+    return `${envUrl.replace(/\/$/, "")}/${uploadPath}`;
   }
 
-  // 4. Local static frontend assets (e.g. assets/images/..., iaccslogo.png, etc.)
+  // 4. Local static frontend assets
   if (cleanPath.startsWith("assets/") || cleanPath.startsWith("images/")) {
     return `/${cleanPath}`;
   }

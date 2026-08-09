@@ -373,10 +373,10 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
                                             <button type="button" onclick='openDynamicPageInfoModal(<?= $item_json ?>)' class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors" title="View Page Info & Metadata">
                                                 <span class="material-symbols-outlined text-[18px]">info</span>
                                             </button>
-                                            <a href="http://localhost:8000/<?= htmlspecialchars(ltrim($item['slug'], '/')) ?>" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-400 hover:text-green-600 transition-colors" title="View Page (Opens in new tab)">
+                                            <a href="<?= $frontend_url ?>/<?= htmlspecialchars(ltrim($item['slug'], '/')) ?>" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-400 hover:text-green-600 transition-colors" title="View Page (Opens in new tab)">
                                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                                             </a>
-                                            <button type="button" onclick="copyPageLink('http://localhost:8000/<?= htmlspecialchars(ltrim($item['slug'], '/')) ?>')" class="p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Copy Page Link">
+                                            <button type="button" onclick="copyPageLink('<?= $frontend_url ?>/<?= htmlspecialchars(ltrim($item['slug'], '/')) ?>')" class="p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Copy Page Link">
                                                 <span class="material-symbols-outlined text-[18px]">content_copy</span>
                                             </button>
                                             <a href="?action=edit&edit_id=<?= $item['id'] ?>" class="p-1.5 text-slate-400 hover:text-primary transition-colors" title="Edit Page">
@@ -757,7 +757,7 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
             statusEl.textContent = 'Inactive';
         }
 
-        const pageUrl = 'http://localhost:8000/' + (item.slug ? item.slug.replace(/^\/+/, '') : '');
+        const pageUrl = window.location.origin + '/' + (item.slug ? item.slug.replace(/^\/+/, '') : '');
         const liveLinkEl = document.getElementById('infoLiveLink');
         liveLinkEl.href = pageUrl;
         liveLinkEl.textContent = pageUrl;
@@ -773,7 +773,7 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
                     if (hero.hero_image) {
                         const imgUrl = (hero.hero_image.startsWith('http://') || hero.hero_image.startsWith('https://') || hero.hero_image.startsWith('/')) 
                             ? hero.hero_image 
-                            : 'http://localhost:8000/' + hero.hero_image.replace(/^\/+/, '');
+                            : window.location.origin + '/' + hero.hero_image.replace(/^\/+/, '');
                         imagePreview = `<div class="mt-2 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 max-h-32"><img src="${imgUrl}" class="w-full h-24 object-cover" alt="Hero Banner Preview"/></div>`;
                     }
                     heroHtml = `

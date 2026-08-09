@@ -415,10 +415,10 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
                                     </td>
                                     <td class="md:sticky md:right-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-3 text-right shadow-[-4px_0_4px_-2px_rgba(0,0,0,0.05)]">
                                         <div class="flex items-center justify-end gap-1">
-                                            <a href="http://localhost:8000/<?= htmlspecialchars(ltrim($p['slug'], '/')) ?>" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-400 hover:text-green-600 transition-colors" title="View Page (Opens in new tab)">
+                                            <a href="<?= $frontend_url ?>/<?= htmlspecialchars(ltrim($p['slug'], '/')) ?>" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-400 hover:text-green-600 transition-colors" title="View Page (Opens in new tab)">
                                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                                             </a>
-                                            <button type="button" onclick="copyPageLink('http://localhost:8000/<?= htmlspecialchars(ltrim($p['slug'], '/')) ?>')" class="p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Copy Page Link">
+                                            <button type="button" onclick="copyPageLink('<?= $frontend_url ?>/<?= htmlspecialchars(ltrim($p['slug'], '/')) ?>')" class="p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Copy Page Link">
                                                 <span class="material-symbols-outlined text-[18px]">content_copy</span>
                                             </button>
                                             <?php
