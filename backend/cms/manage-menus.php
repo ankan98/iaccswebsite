@@ -319,7 +319,7 @@ foreach ($default_routes as $dr) {
     <?php endforeach; ?>
 </datalist>
 
-<div class="max-w-6xl mx-auto space-y-4 md:space-y-6 pb-20 px-3 sm:px-6 md:px-8">
+<div class="w-full space-y-4 md:space-y-6 pb-20 px-3 sm:px-6 md:px-8">
     <!-- Header Area -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>

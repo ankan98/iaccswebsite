@@ -11,21 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $conn = require_once __DIR__ . '/conn.php';
 
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
+$is_home_request = ($slug === 'home' || $slug === '/' || $slug === '' || $slug === 'index');
 
-if (empty($slug)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Slug parameter is required.']);
-    exit;
+if ($is_home_request) {
+    $stmt = $conn->prepare("SELECT title, heading, subheading, btn_text, btn_link, content, custom_css, home_json, about_json, contact_json FROM cms_pages WHERE (slug = 'home' OR slug = '/' OR slug = '' OR title = 'Home') AND status = 'published' LIMIT 1");
+} else {
+    $stmt = $conn->prepare("SELECT title, heading, subheading, btn_text, btn_link, content, custom_css, home_json, about_json, contact_json FROM cms_pages WHERE slug = ? AND status = 'published' LIMIT 1");
+    $stmt->bind_param("s", $slug);
 }
 
-$stmt = $conn->prepare("SELECT title, heading, subheading, btn_text, btn_link, content, custom_css, home_json, about_json, contact_json FROM cms_pages WHERE slug = ? AND status = 'published' LIMIT 1");
-$stmt->bind_param("s", $slug);
 $stmt->execute();
 $result = $stmt->get_result();
 $page = $result->fetch_assoc();
 $stmt->close();
 
-if (!$page) {
+if (!$page && !$is_home_request) {
     // Check in notices table for dynamic pages
     $stmt = $conn->prepare("SELECT title, page_heading AS heading, page_content AS content, status, hero_json, custom_css, meta_description, meta_keyword FROM notices WHERE slug = ? AND (type = 'page' OR type = '' OR type IS NULL) LIMIT 1");
     $stmt->bind_param("s", $slug);
@@ -53,7 +53,7 @@ if (!$page) {
 }
 
 if ($page && $slug === 'about-us') {
-    $home_stmt = $conn->prepare("SELECT home_json FROM cms_pages WHERE slug = 'home' LIMIT 1");
+    $home_stmt = $conn->prepare("SELECT home_json FROM cms_pages WHERE (slug = 'home' OR slug = '/' OR slug = '' OR title = 'Home') LIMIT 1");
     if ($home_stmt) {
         $home_stmt->execute();
         $home_res = $home_stmt->get_result()->fetch_assoc();

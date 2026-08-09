@@ -250,7 +250,7 @@ if ($is_members_synced) {
 }
 ?>
 
-<div class="max-w-6xl mx-auto space-y-6 pb-28">
+<div class="w-full space-y-6 pb-28">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -450,7 +450,7 @@ if ($is_members_synced) {
 
     <!-- FORM CONTROLS (Sticky/Fixed Footer Bar) -->
     <div class="fixed bottom-0 left-64 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.03),0_-2px_4px_-1px_rgba(0,0,0,0.02)]">
-        <div class="w-full max-w-6xl flex justify-end gap-3">
+        <div class="w-full flex justify-end gap-3">
             <a href="../static-pages.php" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-all flex items-center justify-center">
                 Cancel
             </a>

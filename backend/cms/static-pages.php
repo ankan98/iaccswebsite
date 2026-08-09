@@ -127,7 +127,7 @@ $message_type = $_SESSION['message_type'] ?? '';
 unset($_SESSION['message'], $_SESSION['message_type']);
 
 // System page slugs that cannot be deleted
-$system_slugs = ['home', 'notices-announcements', 'membership', 'membership-status', 'about-us', 'contact-us'];
+$system_slugs = ['', 'notices-announcements', 'membership', 'membership-status', 'about-us', 'contact-us'];
 
 // Handle POST submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -322,7 +322,7 @@ $base_query_string = http_build_query($query_params);
 $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
 ?>
 
-<div class="max-w-6xl mx-auto space-y-3 sm:space-y-4 pb-16">
+<div class="w-full space-y-3 sm:space-y-4 pb-16">
     <!-- Top Action Card -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -424,7 +424,7 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
                                             <?php
                                             $custom_edit_link = "?action=edit&edit_id=" . $p['id'];
                                             $p_slug = strtolower(trim($p['slug']));
-                                            if ($p_slug === 'home') {
+                                            if ($p_slug === 'home' || $p_slug === '/' || $p_slug === '') {
                                                 $custom_edit_link = "static-page-form/home-form.php";
                                             } elseif ($p_slug === 'about-us') {
                                                 $custom_edit_link = "static-page-form/about-us-form.php";
@@ -583,7 +583,7 @@ $link_prefix = '?' . ($base_query_string ? $base_query_string . '&' : '');
 
         <!-- Form Controls (Responsive Sticky Footer Bar) -->
         <div class="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 sm:px-6 py-3 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.03),0_-2px_4px_-1px_rgba(0,0,0,0.02)]">
-            <div class="w-full max-w-6xl mx-auto flex items-center justify-end gap-2.5 sm:gap-3">
+            <div class="w-full flex items-center justify-end gap-2.5 sm:gap-3">
                 <a href="?action=list" class="px-4 sm:px-6 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center justify-center flex-1 sm:flex-none">
                     Cancel
                 </a>
