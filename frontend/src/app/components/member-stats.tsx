@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { buildPhpUrl } from "@/app/lib/utils";
 
 type Counts = {
   student: number;
@@ -8,14 +9,7 @@ type Counts = {
 };
 
 function getCountsUrl() {
-  const host = window.location.hostname;
-  if (host === "localhost" || host === "127.0.0.1") {
-    return "http://localhost/iaccs/membership_counts.php";
-  }
-  if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.org.in/membership_counts.php";
-  }
-  return "/membership_counts.php";
+  return buildPhpUrl("membership_counts.php");
 }
 
 export default function MemberStats() {

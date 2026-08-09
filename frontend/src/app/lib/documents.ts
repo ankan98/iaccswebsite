@@ -19,20 +19,15 @@ export type DocumentsResponse = {
   message?: string;
 };
 
+import { buildPhpUrl } from "@/app/lib/utils";
+
 export function normalizeHostname(host?: string | null) {
   if (!host) return "";
   return host.split(":")[0]?.toLowerCase() ?? "";
 }
 
 export function getDocumentsBaseUrlByHost(hostname?: string | null) {
-  const host = (hostname ?? "").toLowerCase();
-  if (host === "localhost" || host === "127.0.0.1") {
-    return "http://localhost/iaccs/documents_list.php";
-  }
-  if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.org.in/documents_list.php";
-  }
-  return "/documents_list.php";
+  return buildPhpUrl("documents_list.php", hostname);
 }
 
 export function buildDocumentsUrl(params: {

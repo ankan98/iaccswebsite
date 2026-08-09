@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -144,6 +144,8 @@ export const metadata: Metadata = {
 
 
 
+import PageLoader from "./components/page-loader";
+
 export default function RootLayout({
 
   children,
@@ -159,6 +161,8 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>      
 
       <body>
+
+        <PageLoader />
 
         <Header />
 
