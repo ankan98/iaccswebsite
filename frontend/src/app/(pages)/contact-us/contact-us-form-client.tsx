@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { buildPhpUrl } from "@/app/lib/utils";
+import { buildPhpUrl, getPhpBaseUrl } from "@/app/lib/utils";
 export default function ContactUsFormClient({ initialPageData }: { initialPageData: any }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -17,8 +17,8 @@ export default function ContactUsFormClient({ initialPageData }: { initialPageDa
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
-    const backendUrl = process.env.NEXT_PUBLIC_PHP_BACKEND_URL || "https://iaccs.org.in";
-    fetch(`${backendUrl}/get_page.php?slug=contact-us`)
+    const apiBase = getPhpBaseUrl();
+    fetch(`${apiBase}/get_page.php?slug=contact-us`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && !data.error) {
