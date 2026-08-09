@@ -38,7 +38,7 @@ echo "Seeding/checking default system pages...\n";
 $standard_pages = [
     [
         'title' => 'Home',
-        'slug' => 'home',
+        'slug' => '',
         'heading' => 'Welcome to ACCS The Association for Critical Care Sciences',
         'subheading' => 'RECOGNITION . STANDARDS . EXCELLENCE .',
         'btn_text' => 'JOIN US TODAY',

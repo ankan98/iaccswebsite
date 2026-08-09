@@ -66,11 +66,12 @@ export default function HeaderClient({ settings, menuItems = [], backendUrl }: H
 
   const renderIcon = (iconPath?: string, defaultImg?: string) => {
     if (iconPath) {
-      const src = iconPath.startsWith("http") ? iconPath : `${backendUrl}/${iconPath.replace(/^\/+/, '')}`;
+      const src = resolveAssetUrl(iconPath);
       return <img src={src} alt="Navigation Icon" width="22" height="20" className="mr-2 object-contain shrink-0" />;
     }
     if (defaultImg) {
-      return <img src={defaultImg} alt="Navigation Icon" width="22" height="20" className="mr-2 object-contain shrink-0" />;
+      const src = resolveAssetUrl(defaultImg);
+      return <img src={src} alt="Navigation Icon" width="22" height="20" className="mr-2 object-contain shrink-0" />;
     }
     return null;
   };

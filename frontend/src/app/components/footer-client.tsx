@@ -58,6 +58,14 @@ export default function FooterClient({ initialSettings, initialFooterMenuItems }
     .filter(([, v]) => v.link)
     .sort(([, a], [, b]) => (a.order ?? 0) - (b.order ?? 0));
 
+  const renderMenuIcon = (iconPath?: string) => {
+    if (iconPath) {
+      const src = resolveAssetUrl(iconPath);
+      return <img src={src} alt="" width="20" height="18" className="mr-2 object-contain shrink-0 inline-block" />;
+    }
+    return <span className="mr-2">&gt;</span>;
+  };
+
   return (
     <footer id="contact" className="w-full">
       {/* Top strip */}
@@ -76,12 +84,12 @@ export default function FooterClient({ initialSettings, initialFooterMenuItems }
                     <li key={item.id}>
                       {isExt ? (
                         <a href={item.url} className="hover:underline inline-flex items-center">
-                          <span className="mr-2">&gt;</span>
+                          {renderMenuIcon(item.icon)}
                           {item.title}
                         </a>
                       ) : (
                         <Link href={item.url} className="hover:underline inline-flex items-center">
-                          <span className="mr-2">&gt;</span>
+                          {renderMenuIcon(item.icon)}
                           {item.title}
                         </Link>
                       )}
@@ -94,12 +102,12 @@ export default function FooterClient({ initialSettings, initialFooterMenuItems }
                               <li key={child.id}>
                                 {isChildExt ? (
                                   <a href={child.url} className="hover:underline inline-flex items-center text-xs opacity-90">
-                                    <span className="mr-1.5">-</span>
+                                    {renderMenuIcon(child.icon)}
                                     {child.title}
                                   </a>
                                 ) : (
                                   <Link href={child.url} className="hover:underline inline-flex items-center text-xs opacity-90">
-                                    <span className="mr-1.5">-</span>
+                                    {renderMenuIcon(child.icon)}
                                     {child.title}
                                   </Link>
                                 )}
