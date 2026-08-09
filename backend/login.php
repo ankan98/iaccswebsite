@@ -1,5 +1,14 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// If user is already logged in, redirect directly to membership submission page (relative URL for dev & live)
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    header("Location: membership-submission.php");
+    exit();
+}
+
 define('LOGIN_ATTEMPT_LIMIT', 5);
 define('LOGIN_ATTEMPT_WINDOW', 60 * 15); // 15 minutes
 

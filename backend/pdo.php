@@ -1,5 +1,5 @@
 <?php
-define('ENVIRONMENT', 'development');
+define('ENVIRONMENT', 'production');
 define('CAN_DELETE', FALSE);
 /**
  * ACCS Membership Admin Panel

@@ -101,7 +101,7 @@ try {
     $stmt->close();
 
     $items = array_map(function ($row) {
-        $filePath = trim((string)($row['path_url'] ?? ''));
+        $filePath = trim((string)($row['file_path'] ?? ''));
         $url = null;
         if ($filePath !== '') {
             if (preg_match('/^https?:\\/\\//i', $filePath)) {

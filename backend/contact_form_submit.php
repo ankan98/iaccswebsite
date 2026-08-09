@@ -1,13 +1,13 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: http://localhost:3000');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+// header('Content-Type: application/json');
+// header('Access-Control-Allow-Origin: http://localhost:3000');
+// header('Access-Control-Allow-Methods: POST, OPTIONS');
+// header('Access-Control-Allow-Headers: Content-Type');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
+// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+//     http_response_code(204);
+//     exit;
+// }
 
 function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -48,6 +48,7 @@ if (!empty($errors)) {
 }
 
 $to = 'admin@iaccs.org.in';
+// $to = 'sk8327656239@gmail.com';
 $site = 'iaccs.org.in';
 $subject = 'Contact Form Submission';
 $body = "You have received a new message from the $site contact form:\n\n"

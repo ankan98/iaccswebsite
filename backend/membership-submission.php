@@ -93,8 +93,6 @@ if (isset($_GET['msg'])) {
         $flash_message = 'Status updated successfully.';
         $flash_type = 'success';
     }
-    // Clean the URL
-    // echo "<script>history.replaceState(null, null, window.location.pathname);</script>";
 }
 
 // --- 4. DEFINITIONS ---
@@ -128,6 +126,8 @@ $togglable_cols = [
     'payment_date' => 'Payment Date',
     'transaction_id' => 'Txn ID',
     'payment_response' => 'Pay Response',
+    'paid_transaction_id_number' => 'Payment Txn ID',
+    'paid_transaction_proof' => 'Payment Proof',
     'photo' => 'Photo',
     'id_proof' => 'ID Proof',
     // 'education_doc' => 'Edu Doc',
@@ -173,7 +173,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete' && !empty($_POST['i
     exit;
 }
 
-// Handle Status Updates (New Feature)
+// Handle Status Updates
 if (isset($_POST['action']) && $_POST['action'] === 'update_status' && !empty($_POST['id'])) {
     $field = $_POST['field']; // 'status' or 'payment_status'
     $val = $_POST['value'];
@@ -198,7 +198,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_membership_id' && !e
     $stmt = $pdo->prepare("UPDATE $table SET membership_id = ? WHERE id = ?");
     $stmt->execute([$membership_id, $id]);
     
-    // Redirect to self (preserves GET params like page/search)
     header("Location: " . $_SERVER['REQUEST_URI']);
     exit;
 }
@@ -233,7 +232,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'xls') {
         echo '</tr></thead><tbody>';
         do {
             echo '<tr>';
-            foreach ($row as $key => $cell) echo '<td>' . (in_array($key, ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id']) ? ("<a href=\"$base_url" . clean($cell). '">' . htmlspecialchars($cell ?? '') . "</a>" ) : (htmlspecialchars($cell ?? ''))) . '</td>';
+            foreach ($row as $key => $cell) echo '<td>' . (in_array($key, ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id', 'paid_transaction_proof']) ? ("<a href=\"$base_url" . clean($cell). '">' . htmlspecialchars($cell ?? '') . "</a>" ) : (htmlspecialchars($cell ?? ''))) . '</td>';
             echo '</tr>';
         } while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
         echo '</tbody>';
@@ -244,7 +243,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'xls') {
 
 // --- 7. DATA FETCHING ---
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$per_page = 20;
+$per_page = 10;
 $offset = ($page - 1) * $per_page;
 
 $where = ["1=1"];
@@ -354,15 +353,23 @@ if ($end_page - $start_page < $max_links - 1) {
     <main class="flex-1 px-4 py-8 md:px-8">
         <div class="mx-auto flex max-w-[1600px] flex-col gap-6">
             
-            <div class="flex flex-col justify-between gap-4 md:flex-row md:items-start">
-                <div class="flex flex-col gap-1">
-                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Membership Submissions</h1>
-                    <p class="text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
+            <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                <div class="flex flex-col gap-0.5">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Membership Submissions</h1>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
                 </div>
-                <div class="flex flex-col justify-between flex-nowrap gap-3 sm:flex-row sm:items-center sm:gap-4 md:gap-6">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
+                        <span class="material-symbols-outlined text-[18px]">language</span>
+                        <span>Manage Website</span>
+                    </a>
+                    <a href="notices-announcements-management.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
+                        <span class="material-symbols-outlined text-[18px]">campaign</span>
+                        <span>Notices & Announcements</span>
+                    </a>
                     <div class="relative">
-                        <button id="colsBtn" onclick="toggleDropdown()" class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">view_column</span>
+                        <button id="colsBtn" onclick="toggleDropdown()" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
+                            <span class="material-symbols-outlined text-[18px]">view_column</span>
                             <span>Select Columns</span>
                         </button>
                         <div id="colsDropdown" class="hidden absolute right-0 top-full mt-2 w-64 max-h-[60vh] overflow-y-auto custom-scrollbar rounded-xl bg-white p-3 shadow-lg ring-1 ring-slate-900/10 dark:bg-slate-900 dark:ring-slate-700 z-50">
@@ -378,12 +385,10 @@ if ($end_page - $start_page < $max_links - 1) {
                             </div>
                         </div>
                     </div>
-                    <div class="relative">
-                        <a href="logout.php" class="w-[100px] flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">logout</span>
-                            <span>Logout</span>
-                        </a>
-                    </div>
+                    <a href="logout.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors shadow-xs">
+                        <span class="material-symbols-outlined text-[18px]">logout</span>
+                        <span>Logout</span>
+                    </a>
                 </div>
             </div>
 
@@ -457,7 +462,7 @@ if ($end_page - $start_page < $max_links - 1) {
                                             <?php 
                                             $val = $row[$key] ?? '';
                                             
-                                            // --- UPDATE 1: Interactive Status Dropdown ---
+                                            // --- Interactive Status Dropdown ---
                                             if ($key === 'status') {
                                                 $opts = ['Pending', 'Approved', 'Rejected'];
                                                 $cls = get_badge_class('status', $val);
@@ -472,7 +477,7 @@ if ($end_page - $start_page < $max_links - 1) {
                                                 }
                                                 echo '</select></form>';
                                             } 
-                                            // --- UPDATE 2: Interactive Payment Dropdown ---
+                                            // --- Interactive Payment Dropdown ---
                                             elseif ($key === 'payment_status') {
                                                 $opts = ['Unpaid', 'Paid', 'Failed'];
                                                 $cls = get_badge_class('payment', $val);
@@ -490,7 +495,7 @@ if ($end_page - $start_page < $max_links - 1) {
                                             // --- Standard Read-Only Fields ---
                                             elseif (strpos($key, 'date') !== false || $key === 'created_at' || $key === 'updated_at' || $key === 'dob') {
                                                 echo fmt_date($val);
-                                            } elseif (in_array($key, ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id']) && !empty($val)) {
+                                            } elseif (in_array($key, ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id', 'paid_transaction_proof']) && !empty($val)) {
                                                 if(filter_var($val, FILTER_VALIDATE_URL) || strpos($val, '/') !== false) {
                                                      echo '<a href="' . clean($val) . '" target="_blank" class="text-primary hover:text-primary/80" title="View"><span class="material-symbols-outlined text-[20px]">description</span></a>';
                                                 } else {
@@ -507,10 +512,13 @@ if ($end_page - $start_page < $max_links - 1) {
                                     <?php endforeach; ?>
                                     <td class="sticky-col-right right-0 bg-white px-4 py-3 dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 shadow-[-4px_0_4px_-2px_rgba(0,0,0,0.05)]">
                                         <div class="flex items-center justify-center gap-2">
-                                            <button type="button" onclick='openEditModal(<?php echo json_encode($row); ?>)' class="text-slate-500 hover:text-primary transition-colors">
+                                            <button type="button" onclick='openEditModal(<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)' class="text-slate-500 hover:text-primary transition-colors">
                                                 <span class="material-symbols-outlined text-[20px]">edit</span>
                                             </button>
-                                            <button type="button" onclick='openModal(<?php echo json_encode($row); ?>)' class="text-slate-500 hover:text-primary transition-colors">
+                                            <button type="button" onclick='openPaymentModal(<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)' class="text-slate-500 hover:text-green-600 transition-colors" title="Payment Info">
+                                                <span class="material-symbols-outlined text-[20px]">payments</span>
+                                            </button>
+                                            <button type="button" onclick='openModal(<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)' class="text-slate-500 hover:text-primary transition-colors">
                                                 <span class="material-symbols-outlined text-[20px]">visibility</span>
                                             </button>
                                             <?php if(CAN_DELETE): ?>
@@ -617,6 +625,27 @@ if ($end_page - $start_page < $max_links - 1) {
     </div>
 </div>
 
+<div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-sm">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl ring-1 ring-slate-900/10">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Payment Info</h3>
+            <button onclick="closePaymentModal()" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Transaction ID</label>
+                <p id="payTxnId" class="text-sm font-medium text-slate-900 dark:text-white mt-1">-</p>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Payment Screenshot</label>
+                <div id="payScreenshotCont" class="mt-2 border rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-800">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     function toggleDropdown() {
@@ -713,16 +742,46 @@ if ($end_page - $start_page < $max_links - 1) {
         document.getElementById('editModal').classList.add('hidden');
     }
 
+    // --- NEW: Payment Modal Functions ---
+    function openPaymentModal(data) {
+        const modal = document.getElementById('paymentModal');
+        const txnIdDisplay = document.getElementById('payTxnId');
+        const screenshotCont = document.getElementById('payScreenshotCont');
+        
+        // Set Transaction ID
+        txnIdDisplay.textContent = data.paid_transaction_id_number || 'Not Provided';
+        
+        // Set Screenshot
+        if (data.paid_transaction_proof) {
+            screenshotCont.innerHTML = `
+                <a href="${data.paid_transaction_proof}" target="_blank">
+                    <img src="${data.paid_transaction_proof}" alt="Payment Proof" class="w-full h-auto max-h-64 object-contain mx-auto" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                </a>
+                <div class="p-2 text-center border-t">
+                    <a href="${data.paid_transaction_proof}" target="_blank" class="text-xs text-primary font-semibold hover:underline">View Full Image</a>
+                </div>`;
+        } else {
+            screenshotCont.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">No screenshot uploaded</div>`;
+        }
+        
+        modal.classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+    }
+
     document.addEventListener('keydown', e => { 
         if (e.key === "Escape") {
             closeModal(); 
             closeEditModal();
             closeConfirmationModal();
             closeDeleteModal();
+            closePaymentModal();
         }
     });
 
-    // --- New Confirmation Modal Logic ---
+    // --- Confirmation Modal Logic ---
     const confirmationModal = document.getElementById('confirmationModal');
     const confirmCancel = document.getElementById('confirmCancel');
     const confirmSave = document.getElementById('confirmSave');
@@ -841,7 +900,6 @@ if ($end_page - $start_page < $max_links - 1) {
             form.submit();
         }
     });
-
 
 </script>
 

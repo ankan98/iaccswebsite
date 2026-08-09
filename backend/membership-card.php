@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once('vendor/autoload.php');
 
 function ensure_tcpdf_cache_dir()
@@ -303,23 +303,132 @@ HTML;
     );
 
     // Generate QR Code using Member ID
-    $pdf->write2DBarcode($memberId, 'QRCODE,L', 15, 140, 30, 30, $style, 'N');
+    $pdf->write2DBarcode($membership_id, 'QRCODE,L', 15, 140, 30, 30, $style, 'N');
 
     // 4. OUTPUT
     return $pdf->Output($file_name, $return_type);
 }
 
+// function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf', $return_type = 'E')
+// {
+//     ensure_tcpdf_cache_dir();
+//     $template_path = __DIR__ . '/templates/e-verification-slip.html';
+//     if (!file_exists($template_path)) {
+//         return false;
+//     }
+
+//     $membership_id = $data['membership_id'] ?? '';
+//     $reference_number = $data['reference_number'] ?? '';
+//     $display_membership_id = $membership_id !== '' ? $membership_id : ($reference_number !== '' ? $reference_number : 'Pending');
+//     $plan_raw = strtolower(trim((string)($data['membership_plan'] ?? '')));
+//     if ($plan_raw === 'student' || $plan_raw === 'basic') {
+//         $membership_category = 'Student';
+//     } elseif ($plan_raw === 'professional' || $plan_raw === 'premium') {
+//         $membership_category = 'Professional';
+//     } else {
+//         $membership_category = $plan_raw !== '' ? ucwords($plan_raw) : '';
+//     }
+//     $membership_type = $membership_category;
+//     $status = $data['status'] ?? 'Pending';
+//     $payment_status = $data['payment_status'] ?? 'Pending';
+//     $valid_until = !empty($data['created_at'])
+//         ? date('M d, Y', strtotime($data['created_at'] . ' +1 year'))
+//         : date('M d, Y', strtotime('+1 year'));
+//     $html = file_get_contents($template_path);
+//     $logo_path = __DIR__ . '/iaccslogo.png';
+//     $logo_src = '';
+//     if (file_exists($logo_path)) {
+//         $logo_src = 'data:image/png;base64,' . base64_encode(file_get_contents($logo_path));
+//     } else {
+//         // 1x1 transparent PNG
+//         $logo_src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P8z/C/HwAGgwJ/lU7H9QAAAABJRU5ErkJggg==';
+//     }
+//     $replacements = array(
+//         '{{NAME}}' => htmlspecialchars($data['name'] ?? '', ENT_QUOTES, 'UTF-8'),
+//         '{{LOGO_SRC}}' => $logo_src,
+//         '{{MEMBERSHIP_ID}}' => htmlspecialchars($display_membership_id, ENT_QUOTES, 'UTF-8'),
+//         '{{BARCODE_VALUE}}' => htmlspecialchars($display_membership_id, ENT_QUOTES, 'UTF-8'),
+//         '{{SIGNATORY_NAME}}' => 'Bapan Sarkar',
+//         '{{MEMBERSHIP_CATEGORY}}' => htmlspecialchars(ucwords($membership_category), ENT_QUOTES, 'UTF-8'),
+//         '{{MEMBERSHIP_STATUS}}' => htmlspecialchars($status === 'Approved' ? 'Active & Verified' : $status, ENT_QUOTES, 'UTF-8'),
+//         '{{QUALIFICATION}}' => htmlspecialchars($data['education'] ?? '', ENT_QUOTES, 'UTF-8'),
+//         '{{EMAIL}}' => htmlspecialchars($data['email'] ?? '', ENT_QUOTES, 'UTF-8'),
+//         '{{CONTACT_NUMBER}}' => htmlspecialchars($data['mobile'] ?? '', ENT_QUOTES, 'UTF-8'),
+//         '{{MEMBERSHIP_TYPE}}' => htmlspecialchars(ucwords($membership_type) . ' membership', ENT_QUOTES, 'UTF-8'),
+//         '{{PAYMENT_STATUS}}' => htmlspecialchars($payment_status, ENT_QUOTES, 'UTF-8'),
+//         '{{VALID_UNTIL}}' => htmlspecialchars($valid_until, ENT_QUOTES, 'UTF-8')
+//     );
+//     $html = str_replace(array_keys($replacements), array_values($replacements), $html);
+//     // print_r($html); exit;
+//     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+//     $pdf->setPrintHeader(false);
+//     $pdf->setPrintFooter(false);
+//     $pdf->SetMargins(6, 6, 6);
+//     $pdf->SetAutoPageBreak(true, 10);
+//     $pdf->AddPage();
+//     $pdf->setFontSubsetting(true);
+//     // $pdf->SetFont('dejavusans', '', 12, '', true);
+//     $pdf->writeHTML($html, true, false, true, false, '');
+
+//     // Draw QR + signature + footer on page 1 (avoid HTML page splitting)
+//     $footer_html = '<div style="font-size:8.0pt; line-height:1.4; color:#111827;">'
+//         . 'This E-Verification Slip is issued solely for internal membership identification purposes by The Association for Critical Care Sciences, an independent non-statutory professional body. It does not constitute, imply, or confer any statutory recognition, regulatory approval, governmental affiliation, accreditation, professional licensure, academic qualification, certification, or legal authority of any nature whatsoever.'
+//         . '<br/>'
+//         . 'The Association is not a government body, regulatory authority, licensing agency, statutory council, or accreditation board. This document shall not be used, presented, or relied upon as evidence of professional competence, clinical authorization, employment eligibility, academic equivalence, or legal entitlement.'
+//         . '<br/>'
+//         . 'Any misuse, misrepresentation, alteration, or unauthorized reliance upon this document is strictly prohibited. The Association assumes no liability for any third-party interpretation or use of this E-Verification Slip beyond its intended internal identification purpose.'
+//         . '</div>';
+
+//     $saved_page = $pdf->getPage();
+//     $pdf->setPage(1);
+
+//     // QR box + QR
+//     $qrBoxX = 14;
+//     $qrBoxY = 205;
+//     $qrBoxSize = 30;
+//     $pdf->Rect($qrBoxX, $qrBoxY, $qrBoxSize, $qrBoxSize);
+//     $qrStyle = array('border' => 0, 'padding' => 0, 'fgcolor' => array(0, 0, 0), 'bgcolor' => false);
+//     $pdf->write2DBarcode($display_membership_id, 'QRCODE,L', $qrBoxX + 1, $qrBoxY + 1, $qrBoxSize - 2, $qrBoxSize - 2, $qrStyle, 'N');
+
+//     // Signature block
+//     $sigPath = __DIR__ . '/assets/images/signature.png';
+//     if (file_exists($sigPath)) {
+//         $pdf->Image($sigPath, 120, 205, 65, 0, 'PNG');
+//     }
+//     $pdf->Line(115, 226, 195, 226);
+//     // $pdf->SetFont('dejavusans', 'B', 9);
+//     $pdf->SetXY(115, 228);
+//     $pdf->Cell(80, 5, 'Authorized Signatory (President)', 0, 1, 'C');
+//     // $pdf->SetFont('dejavusans', '', 9);
+//     $pdf->SetX(115);
+//     $pdf->Cell(80, 5, 'The Association for Critical Care Sciences', 0, 1, 'C');
+
+//     // Footer line + footer text
+//     $pdf->Line(6, 246, 200, 246);
+//     $pdf->SetY(-48  );
+//     // $pdf->SetFont('dejavusans', '', 7);
+//     $pdf->writeHTML($footer_html, true, false, true, false, '');
+
+//     $pdf->setPage($saved_page);
+
+//     // Remove any extra pages created by HTML layout
+//     while ($pdf->getNumPages() > 1) {
+//         $pdf->deletePage(2);
+//     }
+
+//     return $pdf->Output($file_name, $return_type);
+// }
+
 function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf', $return_type = 'E')
 {
-    ensure_tcpdf_cache_dir();
-    $template_path = __DIR__ . '/templates/e-verification-slip.html';
-    if (!file_exists($template_path)) {
-        return false;
-    }
+    // Ensure TCPDF is loaded/available here
+    // ensure_tcpdf_cache_dir(); 
 
+    // --- 1. Process Data ---
     $membership_id = $data['membership_id'] ?? '';
     $reference_number = $data['reference_number'] ?? '';
     $display_membership_id = $membership_id !== '' ? $membership_id : ($reference_number !== '' ? $reference_number : 'Pending');
+    
     $plan_raw = strtolower(trim((string)($data['membership_plan'] ?? '')));
     if ($plan_raw === 'student' || $plan_raw === 'basic') {
         $membership_category = 'Student';
@@ -328,93 +437,129 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
     } else {
         $membership_category = $plan_raw !== '' ? ucwords($plan_raw) : '';
     }
-    $membership_type = $membership_category;
+    
     $status = $data['status'] ?? 'Pending';
     $payment_status = $data['payment_status'] ?? 'Pending';
     $valid_until = !empty($data['created_at'])
         ? date('M d, Y', strtotime($data['created_at'] . ' +1 year'))
         : date('M d, Y', strtotime('+1 year'));
-    $html = file_get_contents($template_path);
-    $logo_path = __DIR__ . '/iaccslogo.png';
-    $logo_src = '';
-    if (file_exists($logo_path)) {
-        $logo_src = 'data:image/png;base64,' . base64_encode(file_get_contents($logo_path));
-    } else {
-        // 1x1 transparent PNG
-        $logo_src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P8z/C/HwAGgwJ/lU7H9QAAAABJRU5ErkJggg==';
-    }
-    $replacements = array(
-        '{{NAME}}' => htmlspecialchars($data['name'] ?? '', ENT_QUOTES, 'UTF-8'),
-        '{{LOGO_SRC}}' => $logo_src,
-        '{{MEMBERSHIP_ID}}' => htmlspecialchars($display_membership_id, ENT_QUOTES, 'UTF-8'),
-        '{{BARCODE_VALUE}}' => htmlspecialchars($display_membership_id, ENT_QUOTES, 'UTF-8'),
-        '{{SIGNATORY_NAME}}' => 'Bapan Sarkar',
-        '{{MEMBERSHIP_CATEGORY}}' => htmlspecialchars(ucwords($membership_category), ENT_QUOTES, 'UTF-8'),
-        '{{MEMBERSHIP_STATUS}}' => htmlspecialchars($status === 'Approved' ? 'Active & Verified' : $status, ENT_QUOTES, 'UTF-8'),
-        '{{QUALIFICATION}}' => htmlspecialchars($data['education'] ?? '', ENT_QUOTES, 'UTF-8'),
-        '{{EMAIL}}' => htmlspecialchars($data['email'] ?? '', ENT_QUOTES, 'UTF-8'),
-        '{{CONTACT_NUMBER}}' => htmlspecialchars($data['mobile'] ?? '', ENT_QUOTES, 'UTF-8'),
-        '{{MEMBERSHIP_TYPE}}' => htmlspecialchars(ucwords($membership_type) . ' membership', ENT_QUOTES, 'UTF-8'),
-        '{{PAYMENT_STATUS}}' => htmlspecialchars($payment_status, ENT_QUOTES, 'UTF-8'),
-        '{{VALID_UNTIL}}' => htmlspecialchars($valid_until, ENT_QUOTES, 'UTF-8')
-    );
-    $html = str_replace(array_keys($replacements), array_values($replacements), $html);
+
+    // --- 2. Initialize TCPDF ---
     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
     $pdf->setPrintHeader(false);
     $pdf->setPrintFooter(false);
-    $pdf->SetMargins(6, 6, 6);
+    $pdf->SetMargins(15, 15, 15);
     $pdf->SetAutoPageBreak(true, 10);
     $pdf->AddPage();
     $pdf->setFontSubsetting(true);
-    $pdf->SetFont('freeserif', '', 12, '', true);
-    $pdf->writeHTML($html, true, false, true, false, '');
 
-    // Draw QR + signature + footer on page 1 (avoid HTML page splitting)
-    $footer_html = '<div style="font-size:8.0pt; line-height:1.4; color:#111827;">'
-        . 'This E-Verification Slip is issued solely for internal membership identification purposes by The Association for Critical Care Sciences, an independent non-statutory professional body. It does not constitute, imply, or confer any statutory recognition, regulatory approval, governmental affiliation, accreditation, professional licensure, academic qualification, certification, or legal authority of any nature whatsoever.'
-        . '<br/>'
-        . 'The Association is not a government body, regulatory authority, licensing agency, statutory council, or accreditation board. This document shall not be used, presented, or relied upon as evidence of professional competence, clinical authorization, employment eligibility, academic equivalence, or legal entitlement.'
-        . '<br/>'
-        . 'Any misuse, misrepresentation, alteration, or unauthorized reliance upon this document is strictly prohibited. The Association assumes no liability for any third-party interpretation or use of this E-Verification Slip beyond its intended internal identification purpose.'
-        . '</div>';
+    // --- 3. Draw Header Section ---
+    // --- 3. Draw Header Section (Image) ---
+    $header_img_path = __DIR__ . '/pdf-header.png';
+    if (file_exists($header_img_path)) {
+        // Positioned at top; adjust 35 to match your image height
+        $pdf->Image($header_img_path, 15, 10, 180, 0, 'PNG');
+        $pdf->SetY(34); // Adjust this Y to sit perfectly under your PNG
+    }
 
-    $saved_page = $pdf->getPage();
-    $pdf->setPage(1);
+    $pdf->Ln(2);
+    $pdf->SetDrawColor(0, 0, 0); 
+    $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
 
-    // QR box + QR
-    $qrBoxX = 14;
-    $qrBoxY = 205;
-    $qrBoxSize = 30;
-    $pdf->Rect($qrBoxX, $qrBoxY, $qrBoxSize, $qrBoxSize);
+    // --- 4. Sub-Header Section (Consolidated One-Line) ---
+    $pdf->SetFont('dejavusans', '', 8);
+    $pdf->SetTextColor(0, 0, 0);
+
+    // Single consolidated line for ESTD, Regulatory, Web, and Email
+    $pdf->Ln(2);
+    $combined_info = 'ESTD 2025. Registered as an AOP for regulatory purposes | www.iaccs.org.in | admin@iaccs.org.in';
+    $pdf->Cell(0, 4, $combined_info, 0, 1, 'C');
+
+    // Line 2: Address (kept separate for readability unless you prefer it also joined)
+    $pdf->SetFont('dejavusans', '', 8);
+    $pdf->Cell(0, 4, 'Address: 168, Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065', 0, 1, 'C');
+
+    // Horizontal Separator Line
+    $pdf->Ln(2);
+    $pdf->SetDrawColor(0, 0, 0); 
+    $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+    
+    $pdf->Ln(6);
+
+    // --- 5. E-Verification Slip Title (Center Aligned) ---
+    $pdf->SetFont('dejavusans', 'B', 13);
+    $pdf->Cell(0, 10, 'E-VERIFICATION SLIP', 0, 1, 'C');
+    $pdf->Line(140, $pdf->GetY() - 2, 67.5, $pdf->GetY() - 2, 'C');
+    $pdf->Ln(8);
+
+    // --- 5. Draw Member Details (Strict layout) ---
+    $fields = [
+        'Name'                => $data['name'] ?? '',
+        'Membership ID'       => $display_membership_id,
+        'Membership Category' => ucwords($membership_category),
+        'Membership Status'   => $status === 'Approved' ? 'Active & Verified' : $status,
+        'Qualification'       => $data['education'] ?? '',
+        'Email'               => $data['email'] ?? '',
+        'Contact Number'      => $data['mobile'] ?? '',
+        'Membership Type'     => ucwords($membership_category) . ' membership',
+        'Payment Status'      => $payment_status,
+        'Valid Until'         => $valid_until
+    ];
+
+    $labelWidth = 55;
+    $valueWidth = 125;
+    $rowHeight = 8;
+
+    foreach ($fields as $label => $value) {
+        $pdf->SetFont('dejavusans', 'B', 10);
+        $pdf->Cell($labelWidth, $rowHeight, $label, 0, 0, 'L');
+        
+        $pdf->SetFont('dejavusans', '', 10);
+        $pdf->Cell(5, $rowHeight, ':', 0, 0, 'C'); // Separator
+        $pdf->Cell($valueWidth, $rowHeight, (string)$value, 0, 1, 'L');
+    }
+
+    // --- 6. Draw QR Code and Signature ---
+    // Fix position to bottom area of the first page to ensure it doesn't split
+    $bottomY = 195; 
+
+    // QR Box & Barcode
+    $qrBoxX = 20;
+    $qrBoxSize = 35;
+    $pdf->Rect($qrBoxX, $bottomY, $qrBoxSize, $qrBoxSize);
     $qrStyle = array('border' => 0, 'padding' => 0, 'fgcolor' => array(0, 0, 0), 'bgcolor' => false);
-    $pdf->write2DBarcode($display_membership_id, 'QRCODE,L', $qrBoxX + 1, $qrBoxY + 1, $qrBoxSize - 2, $qrBoxSize - 2, $qrStyle, 'N');
+    $pdf->write2DBarcode($display_membership_id, 'QRCODE,L', $qrBoxX + 1, $bottomY + 1, $qrBoxSize - 2, $qrBoxSize - 2, $qrStyle, 'N');
 
-    // Signature block
+    // Signature Block
+    $sigX = 105;
     $sigPath = __DIR__ . '/assets/images/signature.png';
     if (file_exists($sigPath)) {
-        $pdf->Image($sigPath, 120, 205, 65, 0, 'PNG');
+        // Adjust signature image position as needed
+        $pdf->Image($sigPath, $sigX + 15, $bottomY + 12.5, 45, 0, 'PNG'); 
     }
-    $pdf->Line(115, 226, 195, 226);
+    
+    // Signature Line
+    $pdf->Line($sigX, $bottomY + 28, $sigX + 75, $bottomY + 28);
+    
+    $pdf->SetXY($sigX, $bottomY + 30);
     $pdf->SetFont('dejavusans', 'B', 9);
-    $pdf->SetXY(115, 228);
-    $pdf->Cell(80, 5, 'Authorized Signatory (President)', 0, 1, 'C');
+    $pdf->Cell(75, 5, 'Authorized Signatory (President)', 0, 1, 'C');
+    
+    $pdf->SetX($sigX);
     $pdf->SetFont('dejavusans', '', 9);
-    $pdf->SetX(115);
-    $pdf->Cell(80, 5, 'The Association for Critical Care Sciences', 0, 1, 'C');
+    $pdf->Cell(75, 5, 'The Association for Critical Care Sciences', 0, 1, 'C');
 
-    // Footer line + footer text
-    $pdf->Line(6, 246, 200, 246);
-    $pdf->SetY(-48  );
+    // --- 7. Draw Footer Disclaimer ---
+    $pdf->SetY(245);
+    $pdf->Line(15, 243, 195, 243); // Footer separator line
     $pdf->SetFont('dejavusans', '', 7);
-    $pdf->writeHTML($footer_html, true, false, true, false, '');
+    $pdf->SetTextColor(50, 50, 50); // Dark Gray
 
-    $pdf->setPage($saved_page);
+    $footer_text = "This E-Verification Slip is issued solely for internal membership identification purposes by The Association for Critical Care Sciences, an independent non-statutory professional body. It does not constitute, imply, or confer any statutory recognition, regulatory approval, governmental affiliation, accreditation, professional licensure, academic qualification, certification, or legal authority of any nature whatsoever.\n\nThe Association is not a government body, regulatory authority, licensing agency, statutory council, or accreditation board. This document shall not be used, presented, or relied upon as evidence of professional competence, clinical authorization, employment eligibility, academic equivalence, or legal entitlement.\n\nAny misuse, misrepresentation, alteration, or unauthorized reliance upon this document is strictly prohibited. The Association assumes no liability for any third-party interpretation or use of this E-Verification Slip beyond its intended internal identification purpose.";
+    
+    $pdf->MultiCell(0, 3, $footer_text, 0, 'J');
 
-    // Remove any extra pages created by HTML layout
-    while ($pdf->getNumPages() > 1) {
-        $pdf->deletePage(2);
-    }
-
+    // --- 8. Output PDF ---
     return $pdf->Output($file_name, $return_type);
 }
 

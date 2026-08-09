@@ -31,24 +31,12 @@ $conditions = [];
 $params = [];
 $types = '';
 
-if ($reference !== '') {
-    $conditions[] = 'reference_number = ?';
-    $params[] = $reference;
-    $types .= 's';
-}
 if ($membership_id !== '') {
     $conditions[] = 'membership_id = ?';
     $params[] = $membership_id;
     $types .= 's';
-}
-if ($email !== '') {
-    $conditions[] = 'email = ?';
-    $params[] = $email;
-    $types .= 's';
-}
-if ($mobile !== '') {
-    $conditions[] = 'mobile = ?';
-    $params[] = $mobile;
+    $conditions[] = 'reference_number = ?';
+    $params[] = $membership_id;
     $types .= 's';
 }
 

@@ -46,7 +46,7 @@ if (!$row) {
 if (ob_get_length()) { ob_clean(); }
 
 if ($type === 'card') {
-   generate_verification_slip($row, 'E_Verification_Slip.pdf', 'I');
+   generate_verification_slip($row, 'E_Verification_Slip.pdf', 'D');
 } else {
 generate_membership_card($row, 'Membership_Card.pdf', 'D');
    
