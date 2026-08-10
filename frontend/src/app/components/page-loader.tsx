@@ -44,7 +44,7 @@ export default function PageLoader() {
           <div className="relative size-16 sm:size-20 bg-white/10 dark:bg-slate-900/60 rounded-full p-2.5 shadow-2xl backdrop-blur-md flex items-center justify-center border border-white/20">
             <Image
               src="/iaccslogo.png"
-              alt="IACCS Preloader Logo"
+              alt="ACCS Preloader Logo"
               width={70}
               height={70}
               className="object-contain animate-pulse"
@@ -57,7 +57,7 @@ export default function PageLoader() {
         {/* Brand Name & Dots */}
         <div className="flex flex-col items-center gap-1.5 text-center">
           <span className="text-white text-sm sm:text-base font-bold tracking-wider">
-            IACCS
+            ACCS
           </span>
           <span className="text-[11px] text-slate-400 font-medium tracking-widest uppercase flex items-center gap-1">
             Loading

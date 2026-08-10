@@ -66,6 +66,13 @@ $edit_id = isset($_REQUEST['edit_id']) ? intval($_REQUEST['edit_id']) : (isset($
 $message = '';
 $message_type = '';
 
+// Retrieve session flash message and unset immediately so it never shows again on reload
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    $message_type = $_SESSION['message_type'] ?? 'success';
+    unset($_SESSION['message'], $_SESSION['message_type']);
+}
+
 // Handle POST submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $post_action = $_POST['action'] ?? '';
@@ -117,14 +124,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO notices (title, slug, meta_description, meta_keyword, page_heading, page_content, hero_json, custom_css, status, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssssssss", $title, $slug, $meta_description, $meta_keyword, $page_heading, $page_content, $hero_json, $custom_css, $status, $type);
             if ($stmt->execute()) {
-                $message = 'Custom Page created successfully!';
-                $message_type = 'success';
-                $action = 'list';
+                $stmt->close();
+                $_SESSION['message'] = 'Custom Page created successfully!';
+                $_SESSION['message_type'] = 'success';
+                header("Location: dynamic-pages.php");
+                exit();
             } else {
                 $message = 'Failed to create page: ' . $conn->error;
                 $message_type = 'error';
+                $stmt->close();
             }
-            $stmt->close();
         }
     } elseif ($post_action === 'edit') {
         $edit_id = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : (isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0);
@@ -172,14 +181,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE notices SET title = ?, slug = ?, meta_description = ?, meta_keyword = ?, page_heading = ?, page_content = ?, hero_json = ?, custom_css = ?, status = ?, type = ? WHERE id = ?");
             $stmt->bind_param("ssssssssssi", $title, $slug, $meta_description, $meta_keyword, $page_heading, $page_content, $hero_json, $custom_css, $status, $type, $edit_id);
             if ($stmt->execute()) {
-                $message = 'Custom Page updated successfully!';
-                $message_type = 'success';
-                $action = 'list';
+                $stmt->close();
+                $_SESSION['message'] = 'Custom Page updated successfully!';
+                $_SESSION['message_type'] = 'success';
+                header("Location: dynamic-pages.php?action=edit&edit_id=" . $edit_id);
+                exit();
             } else {
                 $message = 'Failed to update page: ' . $conn->error;
                 $message_type = 'error';
+                $stmt->close();
             }
-            $stmt->close();
         }
     } elseif ($post_action === 'delete') {
         $delete_id = intval($_POST['delete_id'] ?? 0);
@@ -187,13 +198,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("DELETE FROM notices WHERE id = ?");
             $stmt->bind_param("i", $delete_id);
             if ($stmt->execute()) {
-                $message = 'Custom Page deleted successfully!';
-                $message_type = 'success';
+                $stmt->close();
+                $_SESSION['message'] = 'Custom Page deleted successfully!';
+                $_SESSION['message_type'] = 'success';
+                header("Location: dynamic-pages.php");
+                exit();
             } else {
                 $message = 'Failed to delete page: ' . $conn->error;
                 $message_type = 'error';
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 }

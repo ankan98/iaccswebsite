@@ -41,15 +41,7 @@ export function resolveAssetUrl(url?: string | null, fallback: string = ""): str
   // 3. CMS User Uploads (starts with 'uploads/' or contains '/uploads/')
   if (cleanPath.startsWith("uploads/") || cleanPath.startsWith("cms/uploads/")) {
     const uploadPath = cleanPath.replace(/^cms\//, ""); // strip accidental 'cms/' prefix
-
-    // If running in browser: return relative path from root
-    if (typeof window !== "undefined") {
-      return `/${uploadPath}`;
-    }
-
-    // Server-side build or SSR fallback from environment variable
-    const envUrl = process.env.NEXT_PUBLIC_PHP_BACKEND_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://iaccs.org.in";
-    return `${envUrl.replace(/\/$/, "")}/${uploadPath}`;
+    return `/${uploadPath}`;
   }
 
   // 4. Local static frontend assets

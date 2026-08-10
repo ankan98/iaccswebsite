@@ -103,7 +103,8 @@ export default function DynamicPageClient({ initialPageData, slug }: DynamicPage
                   <div className="flex flex-wrap gap-4">
                     <a
                       href={heroConfig.hero_btn_link || "#"}
-                      className="inline-block px-6 md:px-8 py-2 md:py-3 text-gray-900 rounded-full border-2 border-solid border-black hover:opacity-90 transition text-sm md:text-base font-bold bg-[#38b6ff]"
+                      className="inline-block px-6 md:px-8 py-2 md:py-3 text-gray-900 rounded-full border-2 border-solid border-black hover:opacity-90 transition text-sm md:text-base font-bold"
+                      style={{ backgroundColor: heroConfig.hero_btn_color || "#38b6ff" }}
                     >
                       {heroConfig.hero_btn_text}
                     </a>

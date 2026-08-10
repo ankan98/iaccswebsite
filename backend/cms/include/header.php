@@ -2,19 +2,32 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+ob_start();
 
 $current_page = basename($_SERVER['PHP_SELF']);
-$cms_root = (strpos($_SERVER['PHP_SELF'], '/static-page-form/') !== false) ? '../' : '';
+$script_path = str_replace('\\', '/', $_SERVER['PHP_SELF']);
+
+if (strpos($script_path, '/cms/static-page-form/') !== false) {
+    $cms_root = '../';
+    $backend_root = '../../';
+} elseif (strpos($script_path, '/cms/') !== false || substr($script_path, -4) === '/cms') {
+    $cms_root = '';
+    $backend_root = '../';
+} else {
+    $cms_root = 'cms/';
+    $backend_root = '';
+}
 
 // Session validation: check if user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: " . $cms_root . "../login.php");
+    header("Location: " . $backend_root . "login.php");
     exit();
 }
 
-// Role validation: admin users can ONLY access Membership Submissions, NOT CMS pages!
-if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-    header("Location: " . $cms_root . "../membership-submission.php");
+// Role validation: admin users can ONLY access Membership Submissions!
+$is_admin_restricted_page = (strpos($script_path, '/cms/') !== false || $current_page === 'notices-announcements-management.php');
+if ($is_admin_restricted_page && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header("Location: " . $backend_root . "membership-submission.php");
     exit();
 }
 
@@ -38,7 +51,7 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title><?= isset($page_title) ? $page_title : 'CMS Admin Panel' ?> - ACCS</title>
+    <title><?= isset($page_title) ? $page_title : 'ACCS Control Panel' ?> - ACCS</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -72,11 +85,11 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
             height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(0, 0, 0, 0.05);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 3px;
+            border-radius: 4px;
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #475569;
@@ -107,7 +120,7 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
         });
     </script>
 
-    <!-- Mobile Sidebar Backdrop -->
+    <!-- Sidebar Backdrop Mobile -->
     <div id="cms-sidebar-backdrop" onclick="toggleCmsSidebar()" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs hidden md:hidden"></div>
 
     <!-- Sidebar -->
@@ -115,14 +128,14 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
         <!-- Logo Area -->
         <div class="h-20 sm:h-22 flex items-center justify-between px-3 border-b border-slate-700/50 relative">
             <?php
-            $display_logo_src = $cms_root . '../iaccslogo.png';
+            $display_logo_src = $backend_root . 'iaccslogo.png';
             if (!empty($cms_site_logo)) {
                 $trimmed_logo = trim($cms_site_logo);
                 if (strpos($trimmed_logo, 'http://') === 0 || strpos($trimmed_logo, 'https://') === 0) {
                     $display_logo_src = $trimmed_logo;
                 } else {
                     $clean_logo = preg_replace('#^/?(cms/)?#i', '', $trimmed_logo);
-                    $display_logo_src = $cms_root . '../' . ltrim($clean_logo, '/');
+                    $display_logo_src = $backend_root . ltrim($clean_logo, '/');
                 }
             }
             ?>
@@ -136,46 +149,48 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
         
         <!-- Navigation Menu -->
         <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-            <!-- Site Settings -->
-            <a href="<?= $cms_root ?>general-settings.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'general-settings.php' || $current_page === 'index.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
-                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
-                <span>Site Settings</span>
-            </a>
-            
-            <!-- Manage Menus -->
-            <a href="<?= $cms_root ?>manage-menus.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'manage-menus.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
-                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">menu</span>
-                <span>Manage Menus</span>
-            </a>
-            
-            <!-- Static Pages -->
-            <a href="<?= $cms_root ?>static-pages.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'static-pages.php' || $current_page === 'home-form.php' || $current_page === 'about-us-form.php' || $current_page === 'contact-us-form.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
-                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">article</span>
-                <span>Static Pages</span>
-            </a>
-            
-            <!-- Custom Pages -->
-            <a href="<?= $cms_root ?>dynamic-pages.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'dynamic-pages.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
-                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">web_stories</span>
-                <span>Custom Pages</span>
-            </a>
+            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'super_admin'): ?>
+                <!-- Site Settings -->
+                <a href="<?= $cms_root ?>general-settings.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'general-settings.php' || $current_page === 'index.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+                    <span>Site Settings</span>
+                </a>
+                
+                <!-- Manage Menus -->
+                <a href="<?= $cms_root ?>manage-menus.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'manage-menus.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">menu</span>
+                    <span>Manage Menus</span>
+                </a>
+                
+                <!-- Static Pages -->
+                <a href="<?= $cms_root ?>static-pages.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'static-pages.php' || $current_page === 'home-form.php' || $current_page === 'about-us-form.php' || $current_page === 'contact-us-form.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">article</span>
+                    <span>Static Pages</span>
+                </a>
+                
+                <!-- Custom Pages -->
+                <a href="<?= $cms_root ?>dynamic-pages.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'dynamic-pages.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">web_stories</span>
+                    <span>Custom Pages</span>
+                </a>
+
+                <!-- Notices & Announcements -->
+                <a href="<?= $backend_root ?>notices-announcements-management.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'notices-announcements-management.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
+                    <span>Notices & Announcements</span>
+                </a>
+            <?php endif; ?>
 
             <!-- Membership Submissions -->
-            <a href="<?= $cms_root ?>../membership-submission.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group text-slate-300">
+            <a href="<?= $backend_root ?>membership-submission.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group <?= ($current_page === 'membership-submission.php') ? 'bg-primary text-white shadow-md' : 'text-slate-300' ?>">
                 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">groups</span>
                 <span>Membership Submissions</span>
-            </a>
-
-            <!-- Notices & Announcements -->
-            <a href="<?= $cms_root ?>../notices-announcements-management.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group text-slate-300">
-                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
-                <span>Notices & Announcements</span>
             </a>
         </nav>
         
         <!-- Sidebar Footer -->
         <div class="p-4 border-t border-slate-700/50 text-xs text-center text-slate-500">
-            &copy; 2026 ACCS CMS
+            &copy; 2026 ACCS Control Panel
         </div>
     </aside>
 
@@ -192,12 +207,6 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
             
             <!-- Right Header Navigation -->
             <div class="flex items-center gap-1.5 sm:gap-3">
-                <!-- User Role Badge -->
-                
-
-                <!-- Membership Submissions -->
-                
-
                 <!-- Go Live Site -->
                 <a href="<?= $frontend_url ?>" target="_blank" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-xs" title="Go Live Site">
                     <span class="material-symbols-outlined text-[18px]">public</span>
@@ -205,7 +214,7 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
                 </a>
                 
                 <!-- Logout -->
-                <a href="<?= $cms_root ?>../logout.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-all shadow-xs" title="Logout">
+                <a href="<?= $backend_root ?>logout.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-all shadow-xs" title="Logout">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                     <span class="hidden sm:inline">Logout</span>
                 </a>

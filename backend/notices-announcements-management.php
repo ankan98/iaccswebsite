@@ -7,6 +7,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
+// Admin users can ONLY access Membership Submissions!
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: membership-submission.php');
+    exit();
+}
+
 define('ENVIRONMENT', 'production'); // Change to 'production' as needed
 define('CAN_DELETE', TRUE);
 
@@ -163,39 +169,15 @@ $notices = $data_stmt->fetchAll();
 $link_params = $_GET;
 unset($link_params['page']);
 $link_prefix = '?' . http_build_query($link_params) . (count($link_params) > 0 ? '&' : '');
+
+$page_title = 'Notices & Announcements';
+include 'cms/include/header.php';
 ?>
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Manage Notices & Announcements</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
-                    fontFamily: { "display": ["Inter", "sans-serif"] },
-                },
-            },
-        }
-    </script>
-    <style>
-        html { font-size: 13px; }
-        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        .desc-truncate { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        #flashMessage { opacity: 0; transform: translateY(-20px); transition: opacity 0.3s ease, transform 0.3s ease; }
-    </style>
-</head>
-<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased overflow-x-hidden">
+
+<style>
+    .desc-truncate { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    #flashMessage { opacity: 0; transform: translateY(-20px); transition: opacity 0.3s ease, transform 0.3s ease; }
+</style>
 
 <?php if ($flash_message): ?>
 <div id="flashMessage" class="fixed top-5 right-5 z-[100] p-4 rounded-lg shadow-lg text-white <?= $flash_type === 'success' ? 'bg-green-500' : 'bg-red-500' ?>">
@@ -203,33 +185,13 @@ $link_prefix = '?' . http_build_query($link_params) . (count($link_params) > 0 ?
 </div>
 <?php endif; ?>
 
-<div class="relative flex min-h-screen w-full flex-col">
-    <main class="flex-1 px-3 py-4 sm:px-6 sm:py-6 md:px-8">
-        <div class="mx-auto flex max-w-[1400px] flex-col gap-4 sm:gap-6">
-            
-            <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-                <div class="flex flex-col gap-0.5">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Notices & Announcements</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'super_admin'): ?>
-                        <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
-                            <span class="material-symbols-outlined text-[18px]">language</span>
-                            <span>Manage Website</span>
-                        </a>
-                    <?php endif; ?>
-
-                    <a href="membership-submission.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">groups</span>
-                        <span>Membership Submissions</span>
-                    </a>
-                    <a href="logout.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">logout</span>
-                        <span>Logout</span>
-                    </a>
-                </div>
-            </div>
+<div class="w-full space-y-4 pb-16">
+    <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div class="flex flex-col gap-0.5">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Notices & Announcements</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
+        </div>
+    </div>
 
             <div class="flex w-full flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-slate-800">
                 
@@ -521,5 +483,5 @@ $link_prefix = '?' . http_build_query($link_params) . (count($link_params) > 0 ?
         }
     });
 </script>
-</body>
-</html>
+</div>
+<?php include 'cms/include/footer.php'; ?>

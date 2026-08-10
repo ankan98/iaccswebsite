@@ -58,11 +58,7 @@ export default function FooterClient({ initialSettings, initialFooterMenuItems }
     .filter(([, v]) => v.link)
     .sort(([, a], [, b]) => (a.order ?? 0) - (b.order ?? 0));
 
-  const renderMenuIcon = (iconPath?: string) => {
-    if (iconPath) {
-      const src = resolveAssetUrl(iconPath);
-      return <img src={src} alt="" width="20" height="18" className="mr-2 object-contain shrink-0 inline-block" />;
-    }
+  const renderMenuIcon = (_iconPath?: string) => {
     return <span className="mr-2">&gt;</span>;
   };
 
@@ -122,6 +118,11 @@ export default function FooterClient({ initialSettings, initialFooterMenuItems }
               ) : (
                 /* Fallback static quick links */
                 <>
+                  <li>
+                    <Link href="/" className="hover:underline inline-flex items-center">
+                      <span className="mr-2">&gt;</span> Home
+                    </Link>
+                  </li>
                   <li>
                     <Link href="/about-us" className="hover:underline inline-flex items-center">
                       <span className="mr-2">&gt;</span> About us
