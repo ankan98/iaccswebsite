@@ -3,8 +3,8 @@ session_start();
 
 // If the user is not logged in, redirect to the login page.
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // header('Location: login.php');
-    // exit; // Uncomment in production
+    header('Location: login.php');
+    exit();
 }
 
 define('ENVIRONMENT', 'production'); // Change to 'production' as needed
@@ -213,10 +213,13 @@ $link_prefix = '?' . http_build_query($link_params) . (count($link_params) > 0 ?
                     <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">language</span>
-                        <span>Manage Website</span>
-                    </a>
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'super_admin'): ?>
+                        <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
+                            <span class="material-symbols-outlined text-[18px]">language</span>
+                            <span>Manage Website</span>
+                        </a>
+                    <?php endif; ?>
+
                     <a href="membership-submission.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
                         <span class="material-symbols-outlined text-[18px]">groups</span>
                         <span>Membership Submissions</span>

@@ -176,10 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hero_btn_text = trim($_POST['hero_btn_text'] ?? '');
     $hero_btn_link = trim($_POST['hero_btn_link'] ?? '');
     $hero_content = trim($_POST['hero_content'] ?? '');
+    $page_content = trim($_POST['page_content'] ?? $hero_content);
+    $custom_css = trim($_POST['custom_css'] ?? '');
     $type = trim($_POST['type'] ?? 'static');
 
-    $stmt = $conn->prepare("UPDATE cms_pages SET home_json = ?, heading = ?, subheading = ?, btn_text = ?, btn_link = ?, content = ?, type = ? WHERE (slug = 'home' OR slug = '/' OR slug = '' OR title = 'Home')");
-    $stmt->bind_param("sssssss", $home_json_str, $hero_heading, $hero_subheading, $hero_btn_text, $hero_btn_link, $hero_content, $type);
+    $stmt = $conn->prepare("UPDATE cms_pages SET home_json = ?, heading = ?, subheading = ?, btn_text = ?, btn_link = ?, content = ?, custom_css = ?, type = ? WHERE (slug = 'home' OR slug = '/' OR slug = '' OR title = 'Home')");
+    $stmt->bind_param("ssssssss", $home_json_str, $hero_heading, $hero_subheading, $hero_btn_text, $hero_btn_link, $page_content, $custom_css, $type);
     
     if ($stmt->execute()) {
         $_SESSION['message'] = 'Home Page updated successfully!';
@@ -213,6 +215,8 @@ $hero_subheading = $home_page['subheading'] ?? 'RECOGNITION . STANDARDS . EXCELL
 $hero_btn_text = $home_page['btn_text'] ?? 'JOIN US TODAY';
 $hero_btn_link = $home_page['btn_link'] ?? '/membership';
 $hero_content = $home_page['content'] ?? '<p>ACCS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession.</p>';
+$page_content = $home_page['content'] ?? '';
+$custom_css = $home_page['custom_css'] ?? '';
 
 // Defaults for JSON fields
 $defaults = [
@@ -693,8 +697,8 @@ if (isset($home_json['cards'])) {
                                         </div>
                                     </div>
                                     <div class="space-y-1">
-                                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Card Description</label>
-                                        <textarea name="card_descriptions[<?= $c_idx ?>]" rows="4" class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm"><?= htmlspecialchars($c['description']) ?></textarea>
+                                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Card Description (Rich Text Editor)</label>
+                                        <textarea id="card_desc_<?= $c_idx ?>" name="card_descriptions[<?= $c_idx ?>]" rows="4" class="card-desc-editor w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm"><?= htmlspecialchars($c['description']) ?></textarea>
                                     </div>
                                 </div>
                                 <?php if ($c['image']): ?>
@@ -708,6 +712,31 @@ if (isset($home_json['cards'])) {
                             <span class="material-symbols-outlined text-xs">add</span>
                             <span>Add Card</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Section 8: Page Rich Content -->
+                <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <span class="material-symbols-outlined text-primary text-lg">article</span>
+                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Page Rich Content</h3>
+                    </div>
+                    <div class="space-y-2">
+                        <textarea name="page_content" id="page_content" rows="12" placeholder="HTML and text content for the page..."
+                                  class="w-full p-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"><?= htmlspecialchars($page_content) ?></textarea>
+                    </div>
+                </div>
+
+                <!-- Section 9: Custom Stylesheet -->
+                <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <span class="material-symbols-outlined text-primary text-lg">css</span>
+                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Custom Stylesheet</h3>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Custom CSS Rules (Applied dynamically to page)</label>
+                        <textarea name="custom_css" id="custom_css" rows="6" placeholder="/* Custom page specific styling */"
+                                  class="w-full p-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"><?= htmlspecialchars($custom_css) ?></textarea>
                     </div>
                 </div>
             </div>
@@ -731,10 +760,10 @@ if (isset($home_json['cards'])) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
     tinymce.init({
-        selector: '#hero_content',
+        selector: '#hero_content, #page_content, .card-desc-editor',
         plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount code',
         toolbar: 'undo redo | blocks fontsize | bold italic underline | link table | numlist bullist | code removeformat',
-        height: 320,
+        height: 300,
         branding: false,
         promotion: false
     });
@@ -752,7 +781,6 @@ if (isset($home_json['cards'])) {
         }
     }
 
-    // Dynmamically add items using Timestamp key index generators to prevent collision
     function addMemberRow() {
         const id = Date.now();
         const container = document.getElementById('members-list');
@@ -851,12 +879,23 @@ if (isset($home_json['cards'])) {
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Card Description</label>
-                    <textarea name="card_descriptions[${id}]" rows="4" class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm"></textarea>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Card Description (Rich Text Editor)</label>
+                    <textarea id="card_desc_${id}" name="card_descriptions[${id}]" rows="4" class="card-desc-editor w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm"></textarea>
                 </div>
             </div>
         `;
         container.appendChild(row);
+
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: `#card_desc_${id}`,
+                plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount code',
+                toolbar: 'undo redo | blocks fontsize | bold italic underline | link table | numlist bullist | code removeformat',
+                height: 250,
+                branding: false,
+                promotion: false
+            });
+        }
     }
 </script>
 

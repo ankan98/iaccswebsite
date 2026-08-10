@@ -74,27 +74,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add') {
         $title = trim($_POST['title'] ?? '');
         $url = trim($_POST['url'] ?? '');
-        $sort_order = intval($_POST['sort_order'] ?? 0);
         $parent_id = !empty($_POST['parent_id']) ? intval($_POST['parent_id']) : null;
 
         $icon = $handle_icon_upload('icon', '');
 
         if ($title === '' || $url === '') {
-            $_SESSION['message'] = 'Title and URL are required.';
+            $err = 'Title and URL are required.';
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'message' => $err]);
+                exit();
+            }
+            $_SESSION['message'] = $err;
             $_SESSION['message_type'] = 'error';
             header("Location: manage-menus.php?menu_id=" . $menu_id);
             exit();
         } else {
+            $parent_title = '';
+            if ($parent_id) {
+                // Find parent title and sort_order
+                $stmt_pt = $conn->prepare("SELECT title, sort_order FROM cms_menu_items WHERE id = ? AND menu_id = ?");
+                $stmt_pt->bind_param("ii", $parent_id, $menu_id);
+                $stmt_pt->execute();
+                $res_pt = $stmt_pt->get_result()->fetch_assoc();
+                $stmt_pt->close();
+
+                $parent_order = $res_pt ? intval($res_pt['sort_order']) : 0;
+                $parent_title = $res_pt ? $res_pt['title'] : '';
+
+                // Find max sort_order among existing children of this parent
+                $stmt_c = $conn->prepare("SELECT MAX(sort_order) as max_child_order FROM cms_menu_items WHERE parent_id = ? AND menu_id = ?");
+                $stmt_c->bind_param("ii", $parent_id, $menu_id);
+                $stmt_c->execute();
+                $res_c = $stmt_c->get_result()->fetch_assoc();
+                $stmt_c->close();
+
+                $max_child_order = !empty($res_c['max_child_order']) ? intval($res_c['max_child_order']) : 0;
+                $target_order = max($parent_order, $max_child_order) + 1;
+
+                // Shift items >= target_order
+                $stmt_shift = $conn->prepare("UPDATE cms_menu_items SET sort_order = sort_order + 1 WHERE menu_id = ? AND sort_order >= ?");
+                $stmt_shift->bind_param("ii", $menu_id, $target_order);
+                $stmt_shift->execute();
+                $stmt_shift->close();
+
+                $sort_order = $target_order;
+            } else {
+                // Top-level item: append at max(sort_order) + 1
+                $stmt_max = $conn->prepare("SELECT MAX(sort_order) as max_order FROM cms_menu_items WHERE menu_id = ?");
+                $stmt_max->bind_param("i", $menu_id);
+                $stmt_max->execute();
+                $res_max = $stmt_max->get_result()->fetch_assoc();
+                $stmt_max->close();
+
+                $sort_order = (!empty($res_max['max_order']) ? intval($res_max['max_order']) : 0) + 1;
+            }
+
             $stmt = $conn->prepare("INSERT INTO cms_menu_items (menu_id, title, url, icon, parent_id, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("isssii", $menu_id, $title, $url, $icon, $parent_id, $sort_order);
+            
             if ($stmt->execute()) {
-                $_SESSION['message'] = 'Menu item added successfully!';
+                $new_id = $stmt->insert_id;
+                $stmt->close();
+
+                $msg = 'Menu item added successfully!';
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => $msg,
+                        'item' => [
+                            'id' => $new_id,
+                            'menu_id' => $menu_id,
+                            'title' => $title,
+                            'url' => $url,
+                            'icon' => $icon,
+                            'parent_id' => $parent_id,
+                            'sort_order' => $sort_order,
+                            'parent_title' => $parent_title
+                        ]
+                    ]);
+                    exit();
+                }
+
+                $_SESSION['message'] = $msg;
                 $_SESSION['message_type'] = 'success';
             } else {
-                $_SESSION['message'] = 'Failed to add menu item: ' . $conn->error;
+                $err = 'Failed to add menu item: ' . $conn->error;
+                $stmt->close();
+
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                    header('Content-Type: application/json');
+                    echo json_encode(['status' => 'error', 'message' => $err]);
+                    exit();
+                }
+
+                $_SESSION['message'] = $err;
                 $_SESSION['message_type'] = 'error';
             }
-            $stmt->close();
+
             header("Location: manage-menus.php?menu_id=" . $menu_id);
             exit();
         }
@@ -460,7 +538,7 @@ foreach ($default_routes as $dr) {
                     </h2>
                 </div>
                 
-                <form method="POST" action="" enctype="multipart/form-data" novalidate class="p-4 sm:p-6 space-y-4">
+                <form id="add_menu_form" method="POST" action="" enctype="multipart/form-data" novalidate class="p-4 sm:p-6 space-y-4">
                     <input type="hidden" name="action" value="add"/>
 
                     <!-- Navigation Title -->
@@ -516,13 +594,6 @@ foreach ($default_routes as $dr) {
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-
-                    <!-- Sort Order -->
-                    <div class="space-y-1">
-                        <label for="sort_order" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Display Order</label>
-                        <input type="number" name="sort_order" id="sort_order" value="<?= count($menu_items) + 1 ?>"
-                               class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"/>
                     </div>
 
                     <!-- Submit -->
@@ -657,6 +728,15 @@ foreach ($default_routes as $dr) {
                    .replace(/>/g, "&gt;")
                    .replace(/"/g, "&quot;")
                    .replace(/'/g, "&#039;");
+    }
+
+    function selectSlug(url, title, urlInputId, titleInputId) {
+        const urlInput = document.getElementById(urlInputId);
+        const titleInput = document.getElementById(titleInputId);
+        if (urlInput) urlInput.value = url;
+        if (titleInput && (!titleInput.value || titleInput.value.trim() === '')) {
+            titleInput.value = title;
+        }
     }
 
     function updateRowUI(row, parentRow) {
@@ -834,6 +914,157 @@ foreach ($default_routes as $dr) {
         editSpan.textContent = 'No file chosen';
         editSpan.classList.remove('text-slate-700', 'dark:text-slate-200', 'font-medium');
         editSpan.classList.add('text-slate-400');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const addForm = document.getElementById('add_menu_form');
+        if (addForm) {
+            addForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showAlert(data.message, 'success');
+                        addForm.reset();
+
+                        const addSpan = document.getElementById('add_file_name');
+                        if (addSpan) {
+                            addSpan.textContent = 'No file chosen';
+                            addSpan.classList.remove('text-slate-700', 'dark:text-slate-200', 'font-medium');
+                            addSpan.classList.add('text-slate-400');
+                        }
+
+                        if (data.item) {
+                            appendMenuItemToDOM(data.item);
+                        }
+                    } else {
+                        showAlert(data.message || 'Error adding menu item', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error submitting form:', err);
+                    showAlert('Failed to add menu item. Please try again.', 'error');
+                });
+            });
+        }
+    });
+
+    function appendMenuItemToDOM(item) {
+        const listContainer = document.getElementById('menu_sortable_list');
+        if (!listContainer) {
+            window.location.reload();
+            return;
+        }
+
+        const isChild = !!item.parent_id;
+        const parentTitle = item.parent_title || '';
+        const itemJsonStr = JSON.stringify(item).replace(/'/g, "&#39;");
+
+        const rowHtml = `
+            <div class="menu-item-row border rounded-xl overflow-hidden shadow-2xs transition-all duration-200 ${isChild ? 'ml-3 sm:ml-8 border-l-4 border-l-primary/70 bg-slate-50/70 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}"
+                 data-id="${item.id}"
+                 data-parent-id="${item.parent_id || ''}"
+                 data-sort-order="${item.sort_order}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:px-4 sm:py-3 gap-2.5 sm:gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span class="drag-handle material-symbols-outlined text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-grab active:cursor-grabbing select-none shrink-0" title="Drag to reorder">
+                            drag_indicator
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="item-title-container flex items-center gap-2 flex-wrap">
+                                ${item.icon ? `<img src="../${escapeHtml(item.icon)}" class="w-5 h-5 object-contain rounded shrink-0 bg-slate-100 dark:bg-slate-800 p-0.5" />` : ''}
+
+                                <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                                    ${escapeHtml(item.title)}
+                                </h4>
+
+                                ${isChild ? `
+                                    <span class="sub-item-badge inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/40 shrink-0 shadow-2xs">
+                                        <span class="material-symbols-outlined text-[13px] leading-none">subdirectory_arrow_right</span>
+                                        <span>Sub-item</span>
+                                        ${parentTitle ? `
+                                            <span class="text-blue-400/80 font-normal">under</span>
+                                            <span class="font-bold text-blue-700 dark:text-blue-300">${escapeHtml(parentTitle)}</span>
+                                        ` : ''}
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <p class="text-[11px] sm:text-xs text-slate-400 truncate mt-0.5 font-mono">
+                                ${escapeHtml(item.url)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
+                        <button type="button" onclick='openEditModal(${itemJsonStr})' class="p-1.5 text-slate-400 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+
+                        <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete this menu link?');" class="inline m-0">
+                            <input type="hidden" name="action" value="delete"/>
+                            <input type="hidden" name="item_id" value="${item.id}"/>
+                            <button type="submit" class="p-1.5 text-slate-400 hover:text-red-600 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = rowHtml.trim();
+        const newRow = tempDiv.firstElementChild;
+
+        const existingRows = Array.from(listContainer.querySelectorAll('.menu-item-row'));
+
+        if (item.parent_id) {
+            let targetInsertAfter = null;
+            const parentRow = existingRows.find(r => r.getAttribute('data-id') === String(item.parent_id));
+            if (parentRow) {
+                targetInsertAfter = parentRow;
+                existingRows.forEach(r => {
+                    if (r.getAttribute('data-parent-id') === String(item.parent_id)) {
+                        targetInsertAfter = r;
+                    }
+                });
+            }
+
+            if (targetInsertAfter && targetInsertAfter.nextSibling) {
+                listContainer.insertBefore(newRow, targetInsertAfter.nextSibling);
+            } else {
+                listContainer.appendChild(newRow);
+            }
+        } else {
+            listContainer.appendChild(newRow);
+        }
+
+        if (!item.parent_id) {
+            const addParentSel = document.getElementById('parent_id');
+            const editParentSel = document.getElementById('edit_parent_id');
+            [addParentSel, editParentSel].forEach(sel => {
+                if (sel) {
+                    const opt = document.createElement('option');
+                    opt.value = item.id;
+                    opt.textContent = item.title;
+                    sel.appendChild(opt);
+                }
+            });
+        }
+
+        updateMenuHierarchyFromDOM();
+        saveMenuOrder();
     }
 </script>
 

@@ -32,7 +32,7 @@ function smtp_mailer($to, $subject, $msg, $bcc = [], $attachments = []) {
         );
 
         // --- Recipients ---
-        $mail->setFrom("noreply.accsmembership@gmail.com", "IACCS");
+        $mail->setFrom("noreply.accsmembership@gmail.com", "ACCS");
         $mail->addAddress($to);
         
         // Handle Multiple BCCs

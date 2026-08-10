@@ -327,16 +327,25 @@ export default function HomeClient({ initialPageData, backendUrl }: HomeClientPr
                 {c.title}
               </h3>
 
-              <p
-                className="mt-3 text-gray-700 text-justify text-[16px] md:text-[18px]"
+              <div
+                className="tinymce-content mt-3 text-gray-700 text-justify text-[16px] md:text-[18px] leading-relaxed prose max-w-none"
                 style={{ fontFamily: '"Times New Roman", Times, serif' }}
-              >
-                {c.description}
-              </p>
+                dangerouslySetInnerHTML={{ __html: c.description }}
+              />
             </div>
           ))}
         </div>
       </section>
+
+      {/* Main Body Page Content (Rich HTML) */}
+      {pageData?.content && (
+        <section className="px-4 sm:px-6 md:px-10 lg:px-[110px] py-8">
+          <div
+            className="tinymce-content prose max-w-none text-gray-800 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: pageData.content }}
+          />
+        </section>
+      )}
 
       {/* Custom CSS Rules rendered right before body/container closes */}
       {pageData?.custom_css && (

@@ -93,7 +93,7 @@ export default function HeaderClient({ settings, menuItems = [], backendUrl }: H
             <Link href="/">
               <img
                 src={logoSrc}
-                alt="IACCS Site Logo"
+                alt=""
                 width={100}
                 height={100}
                 onError={(e) => {

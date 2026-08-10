@@ -32,7 +32,7 @@ foreach ($pages_cols as $col_name => $col_definition) {
 $standard_pages = [
     [
         'title' => 'Home',
-        'slug' => 'home',
+        'slug' => '',
         'heading' => 'Welcome to ACCS The Association for Critical Care Sciences',
         'subheading' => 'RECOGNITION . STANDARDS . EXCELLENCE .',
         'btn_text' => 'JOIN US TODAY',

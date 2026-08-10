@@ -359,14 +359,18 @@ if ($end_page - $start_page < $max_links - 1) {
                     <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Total Records: <?php echo $total_rows; ?></p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">language</span>
-                        <span>Manage Website</span>
-                    </a>
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'super_admin'): ?>
+                        <a href="cms/" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
+                            <span class="material-symbols-outlined text-[18px]">language</span>
+                            <span>Manage Website</span>
+                        </a>
+                    <?php endif; ?>
+
                     <a href="notices-announcements-management.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
                         <span class="material-symbols-outlined text-[18px]">campaign</span>
                         <span>Notices & Announcements</span>
                     </a>
+
                     <div class="relative">
                         <button id="colsBtn" onclick="toggleDropdown()" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors shadow-xs">
                             <span class="material-symbols-outlined text-[18px]">view_column</span>
@@ -385,6 +389,7 @@ if ($end_page - $start_page < $max_links - 1) {
                             </div>
                         </div>
                     </div>
+
                     <a href="logout.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors shadow-xs">
                         <span class="material-symbols-outlined text-[18px]">logout</span>
                         <span>Logout</span>

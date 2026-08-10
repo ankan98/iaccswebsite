@@ -12,6 +12,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
+// Role validation: admin users can ONLY access Membership Submissions, NOT CMS pages!
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header("Location: " . $cms_root . "../membership-submission.php");
+    exit();
+}
+
 // Database Connection
 require_once dirname(__DIR__, 2) . '/conn.php';
 
@@ -32,7 +38,7 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title><?= isset($page_title) ? $page_title : 'CMS Admin Panel' ?> - IACCS</title>
+    <title><?= isset($page_title) ? $page_title : 'CMS Admin Panel' ?> - ACCS</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -84,11 +90,7 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
         <div class="relative flex flex-col items-center gap-4">
             <div class="relative size-16 sm:size-20 flex items-center justify-center">
                 <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-[#38b6ff] border-r-[#38b6ff]/50 animate-spin"></div>
-                <?php if (!empty($cms_site_logo)): ?>
-                    <img src="<?= $cms_root . htmlspecialchars($cms_site_logo) ?>" class="size-10 sm:size-12 object-contain animate-pulse" alt="Logo" />
-                <?php else: ?>
-                    <span class="font-bold text-white text-xs tracking-wider">IACCS</span>
-                <?php endif; ?>
+                <span class="font-bold text-white text-xs tracking-wider">ACCS</span>
             </div>
             <span class="text-xs text-slate-300 font-semibold tracking-widest uppercase">Loading...</span>
         </div>
@@ -124,9 +126,9 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
                 }
             }
             ?>
-            <button type="button" onclick="openLogoLightbox('<?= $display_logo_src ?>')" class="flex-1 flex items-center justify-center py-1 group overflow-hidden focus:outline-none cursor-pointer" title="Click to view full site logo in lightbox">
-                <img src="<?= $display_logo_src ?>" class="h-14 sm:h-16 max-h-[64px] max-w-[210px] object-contain transition-transform group-hover:scale-105" alt="Site Logo">
-            </button>
+            <div class="flex-1 flex items-center justify-center py-1 overflow-hidden">
+                <img src="<?= $display_logo_src ?>" class="h-14 sm:h-16 max-h-[64px] max-w-[210px] object-contain" alt="Site Logo">
+            </div>
             <button type="button" onclick="toggleCmsSidebar()" class="md:hidden absolute right-3 text-slate-400 hover:text-white p-1 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-xl">close</span>
             </button>
@@ -157,11 +159,23 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
                 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">web_stories</span>
                 <span>Custom Pages</span>
             </a>
+
+            <!-- Membership Submissions -->
+            <a href="<?= $cms_root ?>../membership-submission.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group text-slate-300">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">groups</span>
+                <span>Membership Submissions</span>
+            </a>
+
+            <!-- Notices & Announcements -->
+            <a href="<?= $cms_root ?>../notices-announcements-management.php" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-sidebar-hover hover:text-white group text-slate-300">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
+                <span>Notices & Announcements</span>
+            </a>
         </nav>
         
         <!-- Sidebar Footer -->
         <div class="p-4 border-t border-slate-700/50 text-xs text-center text-slate-500">
-            &copy; 2026 IACCS CMS
+            &copy; 2026 ACCS CMS
         </div>
     </aside>
 
@@ -178,17 +192,11 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
             
             <!-- Right Header Navigation -->
             <div class="flex items-center gap-1.5 sm:gap-3">
-                <!-- Membership Submissions -->
-                <a href="<?= $cms_root ?>../membership-submission.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-xs" title="Membership Submissions">
-                    <span class="material-symbols-outlined text-[18px]">groups</span>
-                    <span class="hidden md:inline">Membership Submissions</span>
-                </a>
+                <!-- User Role Badge -->
+                
 
-                <!-- Notices & Announcements -->
-                <a href="<?= $cms_root ?>../notices-announcements-management.php" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-xs" title="Notices & Announcements">
-                    <span class="material-symbols-outlined text-[18px]">campaign</span>
-                    <span class="hidden lg:inline">Notices & Announcements</span>
-                </a>
+                <!-- Membership Submissions -->
+                
 
                 <!-- Go Live Site -->
                 <a href="<?= $frontend_url ?>" target="_blank" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-xs" title="Go Live Site">
@@ -220,33 +228,6 @@ $frontend_url = defined('BASE_URL') ? rtrim(BASE_URL, '/') : ((isset($_SERVER['H
                 if (backdrop) backdrop.classList.add('hidden');
             }
         }
-
-        function openLogoLightbox(src) {
-            if (!src) return;
-            const modal = document.getElementById('logo-lightbox-modal');
-            const img = document.getElementById('lightbox-logo-img');
-            if (modal && img) {
-                img.src = src;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-        }
-
-        function closeLogoLightbox(e, force = false) {
-            if (force || (e && e.target && e.target.id === 'logo-lightbox-modal')) {
-                const modal = document.getElementById('logo-lightbox-modal');
-                if (modal) {
-                    modal.classList.remove('flex');
-                    modal.classList.add('hidden');
-                }
-            }
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeLogoLightbox(e, true);
-            }
-        });
         </script>
 
         <!-- Logo Lightbox Modal (Global) -->
