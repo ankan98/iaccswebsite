@@ -47,7 +47,7 @@ function generate_membership_card($data, $file_name = 'Membership_Card.pdf', $re
     $pdf->SetFont('dejavusans', '', 9);
     $pdf->SetTextColor(100, 100, 100);
     $pdf->SetXY(30, 19);
-    $pdf->Cell(0, 0, 'IP: ' . $_SERVER['REMOTE_ADDR'], 0, 0, 'L');
+    $pdf->Cell(0, 0, 'IP: ' . ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'), 0, 0, 'L');
 
     // Header Date (Right Aligned)
     $pdf->SetXY(150, 19);
@@ -445,7 +445,7 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
         : date('M d, Y', strtotime('+1 year'));
 
     // --- 2. Initialize TCPDF ---
-    $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+    $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
     $pdf->setPrintHeader(false);
     $pdf->setPrintFooter(false);
     $pdf->SetMargins(15, 15, 15);
@@ -454,45 +454,42 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
     $pdf->setFontSubsetting(true);
 
     // --- 3. Draw Header Section ---
-    // --- 3. Draw Header Section (Image) ---
     $header_img_path = __DIR__ . '/pdf-header.png';
     if (file_exists($header_img_path)) {
-        // Positioned at top; adjust 35 to match your image height
         $pdf->Image($header_img_path, 15, 10, 180, 0, 'PNG');
-        $pdf->SetY(34); // Adjust this Y to sit perfectly under your PNG
+        $pdf->SetY(34);
     }
 
-    $pdf->Ln(2);
-    $pdf->SetDrawColor(0, 0, 0); 
-    $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
-
-    // --- 4. Sub-Header Section (Consolidated One-Line) ---
+    // --- 4. Sub-Header Section ---
     $pdf->SetFont('dejavusans', '', 8);
     $pdf->SetTextColor(0, 0, 0);
 
-    // Single consolidated line for ESTD, Regulatory, Web, and Email
-    $pdf->Ln(2);
-    $combined_info = 'ESTD 2025. Registered as an AOP for regulatory purposes | www.iaccs.org.in | admin@iaccs.org.in';
-    $pdf->Cell(0, 4, $combined_info, 0, 1, 'C');
-
-    // Line 2: Address (kept separate for readability unless you prefer it also joined)
+    $pdf->SetFont('dejavusans', '', 10);
+    $pdf->Cell(0, 4, 'RECOGNITION.STANDARDS.EXCELLENCE.', 0, 1, 'C');
     $pdf->SetFont('dejavusans', '', 8);
-    $pdf->Cell(0, 4, 'Address: 168, Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065', 0, 1, 'C');
+    $pdf->Ln(2);
+    $pdf->Cell(0, 4, 'A Registered Trust under the Indian Trusts Act, 1882 | www.iaccs.org.in | admin@iaccs.org.in', 0, 1, 'C');
 
-    // Horizontal Separator Line
+    $pdf->Cell(0, 4, 'Reg. No.- IV-1903-00117/2026   Darpan ID- WB/2026/1125917', 0, 1, 'C');
+    
+    $pdf->SetFont('dejavusans', '', 8);
+    $pdf->Cell(0, 4, 'Address:Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065', 0, 1, 'C');
+
     $pdf->Ln(2);
     $pdf->SetDrawColor(0, 0, 0); 
     $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
     
     $pdf->Ln(6);
 
-    // --- 5. E-Verification Slip Title (Center Aligned) ---
+    // --- 5. E-Verification Slip Title ---
     $pdf->SetFont('dejavusans', 'B', 13);
     $pdf->Cell(0, 10, 'E-VERIFICATION SLIP', 0, 1, 'C');
-    $pdf->Line(140, $pdf->GetY() - 2, 67.5, $pdf->GetY() - 2, 'C');
+    
+    // Fixed Error Line
+    $pdf->Line(67.5, $pdf->GetY() - 2, 140, $pdf->GetY() - 2); 
     $pdf->Ln(8);
 
-    // --- 5. Draw Member Details (Strict layout) ---
+    // --- Draw Member Details ---
     $fields = [
         'Name'                => $data['name'] ?? '',
         'Membership ID'       => $display_membership_id,
@@ -515,26 +512,24 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
         $pdf->Cell($labelWidth, $rowHeight, $label, 0, 0, 'L');
         
         $pdf->SetFont('dejavusans', '', 10);
-        $pdf->Cell(5, $rowHeight, ':', 0, 0, 'C'); // Separator
+        $pdf->Cell(5, $rowHeight, ':', 0, 0, 'C');
         $pdf->Cell($valueWidth, $rowHeight, (string)$value, 0, 1, 'L');
     }
 
     // --- 6. Draw QR Code and Signature ---
-    // Fix position to bottom area of the first page to ensure it doesn't split
     $bottomY = 195; 
 
-    // QR Box & Barcode
+    // QR Box
     $qrBoxX = 20;
     $qrBoxSize = 35;
     $pdf->Rect($qrBoxX, $bottomY, $qrBoxSize, $qrBoxSize);
-    $qrStyle = array('border' => 0, 'padding' => 0, 'fgcolor' => array(0, 0, 0), 'bgcolor' => false);
+    $qrStyle = ['border' => 0, 'padding' => 0, 'fgcolor' => [0, 0, 0], 'bgcolor' => false];
     $pdf->write2DBarcode($display_membership_id, 'QRCODE,L', $qrBoxX + 1, $bottomY + 1, $qrBoxSize - 2, $qrBoxSize - 2, $qrStyle, 'N');
 
     // Signature Block
     $sigX = 105;
     $sigPath = __DIR__ . '/assets/images/signature.png';
     if (file_exists($sigPath)) {
-        // Adjust signature image position as needed
         $pdf->Image($sigPath, $sigX + 15, $bottomY + 12.5, 45, 0, 'PNG'); 
     }
     
@@ -551,9 +546,9 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
 
     // --- 7. Draw Footer Disclaimer ---
     $pdf->SetY(245);
-    $pdf->Line(15, 243, 195, 243); // Footer separator line
+    $pdf->Line(15, 243, 195, 243); 
     $pdf->SetFont('dejavusans', '', 7);
-    $pdf->SetTextColor(50, 50, 50); // Dark Gray
+    $pdf->SetTextColor(50, 50, 50);
 
     $footer_text = "This E-Verification Slip is issued solely for internal membership identification purposes by The Association for Critical Care Sciences, an independent non-statutory professional body. It does not constitute, imply, or confer any statutory recognition, regulatory approval, governmental affiliation, accreditation, professional licensure, academic qualification, certification, or legal authority of any nature whatsoever.\n\nThe Association is not a government body, regulatory authority, licensing agency, statutory council, or accreditation board. This document shall not be used, presented, or relied upon as evidence of professional competence, clinical authorization, employment eligibility, academic equivalence, or legal entitlement.\n\nAny misuse, misrepresentation, alteration, or unauthorized reliance upon this document is strictly prohibited. The Association assumes no liability for any third-party interpretation or use of this E-Verification Slip beyond its intended internal identification purpose.";
     
@@ -562,7 +557,6 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
     // --- 8. Output PDF ---
     return $pdf->Output($file_name, $return_type);
 }
-
 function send_verification_complete_email($user)
 {
 

@@ -1,35 +1,21 @@
 <?php
-// header('Access-Control-Allow-Origin: *');
-// header('Access-Control-Allow-Methods: POST, OPTIONS');
-// header('Access-Control-Allow-Headers: Content-Type');
-// if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-//     http_response_code(204);
-//     exit;
-// }
-// ini_set('display_errors', 0);
-// error_reporting(0);
-require_once('mailer.php');
-$DB_HOST = 'localhost';
-$DB_USER = 'agcinfos_iaccs';
-$DB_PASS = 'iaccs#1234X';
-$DB_NAME = 'agcinfos_iaccs';
+ob_start();
+@ini_set('upload_max_filesize', '25M');
+@ini_set('post_max_size', '30M');
+@ini_set('memory_limit', '256M');
 
-$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+$conn = require_once __DIR__ . '/conn.php';
+require_once __DIR__ . '/mailer.php';
+
 $debug_payload = '';
-// Check connection
-if ($conn->connect_error) {
+if (!$conn || $conn->connect_error) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
         'message' => 'Database connection failed.',
-        'error' => ($DB_HOST === 'localhost' || $DB_HOST === '127.0.0.1') ? $conn->connect_error : null,
-        'debug' => $debug_payload,
     ]);
     exit;
 }
-
-// Set charset (important)
-$conn->set_charset('utf8mb4');
 
 header('Content-Type: application/json');
 
@@ -142,13 +128,13 @@ function unique_upload_name(string $prefix, string $originalName, string $mimeTy
  * Saves a validated upload into `uplods/<subdir>/` and returns a DB-safe relative path:
  * e.g. `uplods/photos/<filename>`
  */
-function saveUploadToUplods($file, string $subdir, string $prefix): ?string
+function saveUploadToUploads($file, string $subdir, string $prefix): ?string
 {
     if (!$file || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
         return null;
     }
 
-    $baseDir = __DIR__ . DIRECTORY_SEPARATOR . 'uplods';
+    $baseDir = __DIR__ . DIRECTORY_SEPARATOR . 'uploads';
     $targetDir = $baseDir . DIRECTORY_SEPARATOR . $subdir;
     ensure_dir($targetDir);
 
@@ -161,30 +147,34 @@ function saveUploadToUplods($file, string $subdir, string $prefix): ?string
     }
 
     // Always store forward-slash paths in DB for web links.
-    return 'uplods/' . $subdir . '/' . $filename;
+    return 'uploads/' . $subdir . '/' . $filename;
 }
 
-function validateFile($file, $allowedTypes, $required = false, $maxSize = 2097152) {
-    if(!$file){
-        return null;
-    }
-
-    if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+function validateFile($file, $allowedTypes, $required = false, $maxSize = 15728640) {
+    if (!isset($file) || !is_array($file) || !isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return $required ? ['error' => 'This file is required'] : null;
     }
 
+    if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
+        return ['error' => 'File size exceeds maximum upload limit. Please upload a smaller file.'];
+    }
+
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        return ['error' => 'File upload error'];
+        return ['error' => 'File upload failed (Code ' . $file['error'] . ')'];
     }
 
     if ($file['size'] > $maxSize) {
-        return ['error' => 'File size exceeds 2MB'];
+        return ['error' => 'File size exceeds 15MB limit'];
     }
 
-    if (!in_array($file['type'], $allowedTypes)) {
-        return ['error' => 'Invalid file type'];
-    }
+    $mime = detect_mime_type((string) ($file['tmp_name'] ?? '')) ?: ((string) ($file['type'] ?? ''));
+    $ext = safe_extension((string) ($file['name'] ?? ''), $mime);
 
+    $validExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'heic', 'heif'];
+    if (!empty($ext) && !in_array($ext, $validExts)) {
+        return ['error' => 'Invalid file extension .' . $ext . '. Allowed: JPG, PNG, WEBP, PDF'];
+    }
+    unset($file['error']);
     return $file;
 }
 
@@ -403,9 +393,12 @@ if ($action === 'payment') {
 
     $paymentProofPath = null;
     if ($payment_proof) {
-        $savedName = saveUpload($payment_proof, __DIR__ . '/assets/payment_recive');
-        if ($savedName) {
-            $paymentProofPath = 'assets/payment_recive/' . $savedName;
+        $paymentProofPath = saveUploadToUploads($_FILES['payment_proof'] ?? null, 'payment_proofs', 'pay_');
+        if (!$paymentProofPath) {
+            $savedName = saveUpload($payment_proof, __DIR__ . '/assets/payment_recive');
+            if ($savedName) {
+                $paymentProofPath = 'assets/payment_recive/' . $savedName;
+            }
         }
     }
 
@@ -452,25 +445,34 @@ if ($action === 'payment') {
     $admin_to = 'admin@iaccs.org.in';
 
     // Send Payment Confirmation to Applicant
-    if ( !empty($applicant_email)) {
-        send_payment_confirmation_mail(
-            $applicant_email,
-            $applicant_name ?: 'Applicant',
-            $reference_number,
-            $transaction_id,
-            $paymentProofPath
-        );
+    if (!empty($applicant_email)) {
+        try {
+            send_payment_confirmation_mail(
+                $applicant_email,
+                $applicant_name ?: 'Applicant',
+                $reference_number,
+                $transaction_id,
+                $paymentProofPath
+            );
+        } catch (Throwable $e) {
+            // Silently swallow mail exceptions
+        }
     }
     
     // Send Payment Received Notification to Admin
     $admin_subject = "Payment Received - Ref: $reference_number";
     $admin_msg = "Payment has been submitted for Application Ref: $reference_number.\nTransaction ID: $transaction_id\nApplicant Name: $applicant_name";
-    mail($admin_to, $admin_subject, $admin_msg, "From: noreply@iaccs.org.in\r\n");
+    try {
+        @mail($admin_to, $admin_subject, $admin_msg, "From: noreply@iaccs.org.in\r\n");
+    } catch (Throwable $e) {
+        // Silently swallow mail exceptions
+    }
 
     $base_url = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'))
         ? 'http://localhost/iaccs/'
         : 'https://iaccs.org.in/';
 
+    if (ob_get_length()) ob_clean();
     echo json_encode([
         'success' => true,
         'message' => 'Payment details submitted successfully.',
@@ -480,49 +482,49 @@ if ($action === 'payment') {
     exit;
 }
 
-function insert_membership_request(mysqli $conn, $reference_number, $membership_id): bool
+function insert_membership_request(mysqli $conn, string $reference_number, string $membership_id, array $file_paths = []): bool
 {
     $data = [
-        'name' => clean($_POST['name']),
-        'father_name' => clean($_POST['father_name']),
-        'dob' => clean($_POST['dob']),
-        'age' => clean($_POST['age']),
-        'gender' => clean($_POST['gender']),
+        'name' => clean($_POST['name'] ?? ''),
+        'father_name' => clean($_POST['father_name'] ?? ''),
+        'dob' => clean($_POST['dob'] ?? ''),
+        'age' => clean($_POST['age'] ?? ''),
+        'gender' => clean($_POST['gender'] ?? ''),
 
-        'address' => clean($_POST['address']),
-        'city' => clean($_POST['city']),
-        'district' => clean($_POST['district']),
-        'pin' => clean($_POST['pin']),
-        'state' => clean($_POST['state']),
+        'address' => clean($_POST['address'] ?? ''),
+        'city' => clean($_POST['city'] ?? ''),
+        'district' => clean($_POST['district'] ?? ''),
+        'pin' => clean($_POST['pin'] ?? ''),
+        'state' => clean($_POST['state'] ?? ''),
 
-        'mobile' => clean($_POST['mobile']),
-        'email' => clean($_POST['email']),
-        'nationality' => clean($_POST['nationality']),
+        'mobile' => clean($_POST['mobile'] ?? ''),
+        'email' => clean($_POST['email'] ?? ''),
+        'nationality' => clean($_POST['nationality'] ?? ''),
 
-        'education' => clean($_POST['education']),
-        'education_status' => clean($_POST['education_status']),
-        'academic_session' => clean($_POST['academic_session']),
-        'college_name' => clean($_POST['college_name']),
-        'university_name' => clean($_POST['university_name']),
+        'education' => clean($_POST['education'] ?? ''),
+        'education_status' => clean($_POST['education_status'] ?? ''),
+        'academic_session' => clean($_POST['academic_session'] ?? ''),
+        'college_name' => clean($_POST['college_name'] ?? ''),
+        'university_name' => clean($_POST['university_name'] ?? ''),
 
-        'employed' => clean($_POST['employed']),
-        'employment_type' => clean($_POST['employment_type']),
-        'hospital_name' => clean($_POST['hospital_name']),
-        'designation' => clean($_POST['designation']),
-        'employee_id' => clean($_POST['employee_id']),
+        'employed' => clean($_POST['employed'] ?? 'No'),
+        'employment_type' => clean($_POST['employment_type'] ?? ''),
+        'hospital_name' => clean($_POST['hospital_name'] ?? ''),
+        'designation' => clean($_POST['designation'] ?? ''),
+        'employee_id' => clean($_POST['employee_id'] ?? ''),
 
-        'membership_plan' => clean($_POST['membership_plan']),
+        'membership_plan' => clean($_POST['membership_plan'] ?? ''),
         'amount' => (float) ($_POST['amount'] ?? 0),
         'reference_number' => $reference_number,
         'membership_id' => $membership_id,
 
-        'photo' => "",
-        'id_proof' => "",
-        'education_doc' => "",
-        'student_id' => "",
-        'employment_proof' => "",
-        'paid_transaction_id_number' => "",
-        'paid_transaction_proof' => "",
+        'photo' => $file_paths['photo'] ?? '',
+        'id_proof' => $file_paths['id_proof'] ?? '',
+        'education_doc' => $file_paths['education_doc'] ?? '',
+        'student_id' => $file_paths['student_id'] ?? '',
+        'employment_proof' => $file_paths['employment_proof'] ?? '',
+        'paid_transaction_id_number' => '',
+        'paid_transaction_proof' => '',
     ];
 
     $sql = "
@@ -588,51 +590,31 @@ function insert_membership_request(mysqli $conn, $reference_number, $membership_
 
 
 function send_thank_you_mail($toEmail, $name, $membership_plan, $amount, $reference_number) {
-
-    $upiId   = 'bapandoct.98-1@okaxis';
     $subject = 'Acknowledgement of Membership Application - ACCS';
-
-    // QR image path (local server path)
-    // $qrPath = __DIR__ . '/google_pay.jpg'; // <-- save QR image with this name
-    // $qrCid  = 'https://iaccs.org.in/google_pay.jpg';
-
-    // $boundary = md5(time());
-
-    // $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
-    // $headers .= "MIME-Version: 1.0\r\n";
-    // $headers .= "Content-Type: multipart/related; boundary=\"$boundary\"\r\n";
-
-    /* ===============================
-       Email HTML Body
-    ================================ */
-    $htmlBody = "Dear Applicant $name,
-
-Thank you for submitting your membership application to the Association for Critical Care Sciences (ACCS).
-
-Your application reference number is <b>$reference_number</b>. We are pleased to inform you that your application has been successfully received and securely recorded in our system.
-
- Membership approval and further communication will be shared with you within 3-5 working days.
-
-For any assistance or queries, please contact us at admin@iaccs.org.in. We'll get back to you promptly, usually within I-2 working days.
-
-Thank you for choosing to join the ACCS community. We are excited to have you on.
-
-Regards,
+    $htmlBody = "Dear Applicant $name,<br/><br/>
+Thank you for submitting your membership application to the Association for Critical Care Sciences (ACCS).<br/><br/>
+Your application reference number is <b>$reference_number</b>. We are pleased to inform you that your application has been successfully received and securely recorded in our system.<br/><br/>
+Membership approval and further communication will be shared with you within 3-5 working days.<br/><br/>
+For any assistance or queries, please contact us at admin@iaccs.org.in. We'll get back to you promptly, usually within 1-2 working days.<br/><br/>
+Thank you for choosing to join the ACCS community.<br/><br/>
+Regards,<br/>
 Association for Critical Care Sciences (ACCS)";
 
-    $htmlBody = nl2br($htmlBody);
+    if (function_exists('smtp_mailer')) {
+        try {
+            $sent = smtp_mailer($toEmail, $subject, $htmlBody);
+            if ($sent) return true;
+        } catch (Throwable $e) {
+            // fallback to mail
+        }
+    }
 
-    // /* ===============================
-    //   Build Email
-    // ================================ */
-    // $message  = "--$boundary\r\n";
-    // $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
-    // $message .= $htmlBody . "\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+    $headers .= "Reply-To: noreply@iaccs.org.in\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
-    // $message .= "--$boundary--";
-
-    return smtp_mailer($toEmail, $subject, $htmlBody);
-    // return mail($toEmail, $subject, $message, $headers);
+    return @mail($toEmail, $subject, $htmlBody, $headers);
 }
 
 function send_payment_confirmation_mail($toEmail, $name, $reference_number, $transaction_id, $paymentProofPath = null) {
@@ -654,32 +636,29 @@ function send_payment_confirmation_mail($toEmail, $name, $reference_number, $tra
     <p>Regards,<br/>Association for Critical Care Sciences (ACCS)</p>
     ";
 
-    // Build the email body
     $message  = "--$boundary\r\n";
     $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
     $message .= $htmlBody . "\r\n";
 
-    // Attach the payment proof if it exists
     if (!empty($paymentProofPath)) {
-        // Convert the relative path to an absolute path for the file system
         $absPath = __DIR__ . '/' . ltrim($paymentProofPath, '/');
         attachFileFromPath($message, $absPath, $boundary);
     }
 
     $message .= "--$boundary--";
 
-    return mail($toEmail, $subject, $message, $headers);
+    return @mail($toEmail, $subject, $message, $headers);
 }
 
 
 /* ===============================
    Collect Form Data (Step 1)
 ================================ */
-$name              = clean($_POST['name']);
-$father_name       = clean($_POST['father_name']);
-$dob               = clean($_POST['dob']);
-$age               = clean($_POST['age']);
-$gender            = clean($_POST['gender']);
+$name              = clean($_POST['name'] ?? '');
+$father_name       = clean($_POST['father_name'] ?? '');
+$dob               = clean($_POST['dob'] ?? '');
+$age               = clean($_POST['age'] ?? '');
+$gender            = clean($_POST['gender'] ?? '');
 
 $address           = clean($_POST['address']);
 $city              = clean($_POST['city']);
@@ -708,37 +687,102 @@ $reference_number   = create_new_reference_number($conn);
 $membership_id      = create_membership_id($conn, $state);
 
 /* ===============================
-   File Uploads
+   File Uploads & Validation
 ================================ */
 $photo = validateFile(
     $_FILES['photo'] ?? null,
-    ['image/jpeg', 'image/png'],
-    false
+    ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+    true // REQUIRED
 );
 
 $id_proof = validateFile(
     $_FILES['id_proof'] ?? null,
-    ['image/jpeg', 'image/png', 'application/pdf'],
-    false
+    ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'],
+    true // REQUIRED
 );
 
 $education_doc = validateFile(
     $_FILES['education_doc'] ?? null,
-    ['image/jpeg', 'image/png', 'application/pdf'],
+    ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'],
     false
 );
 
 $student_id = validateFile(
     $_FILES['student_id'] ?? null,
-    ['image/jpeg', 'image/png', 'application/pdf'],
+    ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'],
     false
 );
 
 $employment_proof = validateFile(
     $_FILES['employment_proof'] ?? null,
-    ['image/jpeg', 'image/png', 'application/pdf'],
+    ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'],
     false
 );
+
+$fileErrors = [];
+if (is_array($photo) && isset($photo['error'])) {
+    $fileErrors['photo'] = ($photo['error'] === 'This file is required') ? 'Passport size photo is required' : $photo['error'];
+}
+if (is_array($id_proof) && isset($id_proof['error'])) {
+    $fileErrors['id_proof'] = ($id_proof['error'] === 'This file is required') ? 'ID Card / Registration Certificate is required' : $id_proof['error'];
+}
+if (is_array($education_doc) && isset($education_doc['error'])) {
+    $fileErrors['education_doc'] = $education_doc['error'];
+}
+if (is_array($student_id) && isset($student_id['error'])) {
+    $fileErrors['student_id'] = $student_id['error'];
+}
+if (is_array($employment_proof) && isset($employment_proof['error'])) {
+    $fileErrors['employment_proof'] = $employment_proof['error'];
+}
+
+if (!empty($fileErrors)) {
+    if (ob_get_length()) ob_clean();
+    echo json_encode([
+        'success' => false,
+        'message' => 'Please upload all required document files.',
+        'errors' => $fileErrors,
+        'debug' => $debug_payload
+    ]);
+    exit;
+}
+
+// Save uploaded files into separate subfolders in uploads/
+$file_paths = [
+    'photo' => saveUploadToUploads($_FILES['photo'] ?? null, 'photos', 'photo_') ?: '',
+    'id_proof' => saveUploadToUploads($_FILES['id_proof'] ?? null, 'id_proofs', 'id_proof_') ?: '',
+    'education_doc' => saveUploadToUploads($_FILES['education_doc'] ?? null, 'education_docs', 'edu_') ?: '',
+    'student_id' => saveUploadToUploads($_FILES['student_id'] ?? null, 'student_ids', 'student_') ?: '',
+    'employment_proof' => saveUploadToUploads($_FILES['employment_proof'] ?? null, 'employment_proofs', 'emp_') ?: '',
+];
+
+// Email OTP Verification Check
+require_once __DIR__ . '/otp_helper.php';
+ensure_email_otps_table($conn);
+
+$stmtOtpCheck = $conn->prepare("SELECT id FROM email_otps WHERE email = ? AND is_verified = 1 LIMIT 1");
+$is_email_verified = false;
+if ($stmtOtpCheck) {
+    $stmtOtpCheck->bind_param("s", $email);
+    $stmtOtpCheck->execute();
+    $stmtOtpCheck->store_result();
+    if ($stmtOtpCheck->num_rows > 0) {
+        $is_email_verified = true;
+    }
+}
+
+if (!$is_email_verified) {
+    if (ob_get_length()) ob_clean();
+    echo json_encode([
+        'success' => false,
+        'message' => 'Email verification required. Please verify your email with OTP.',
+        'errors' => [
+            'email' => 'Email address is not verified via OTP.'
+        ],
+        'debug' => $debug_payload
+    ]);
+    exit;
+}
 
 // Duplicate check (email + mobile) to prevent multiple submissions
 // if (is_duplicate_membership($conn, $email, $mobile)) {
@@ -834,14 +878,14 @@ $message .= "--$boundary--";
    Send Email
 ================================ */
 try {
-    $inserted = insert_membership_request($conn, $reference_number, $membership_id);
+    $inserted = insert_membership_request($conn, $reference_number, $membership_id, $file_paths);
     $adminMailed = false;
     $thankMailed = false;
 
     if ($inserted) {
         
         // Step 1: SEND NEW APPLICATION MAIL TO ADMIN (With Attachments)
-        $adminMailed = mail($to, $subject, $message, $headers);
+        $adminMailed = @mail($to, $subject, $message, $headers);
         
         // Step 1: Send thank-you/payment mail to APPLICANT.
         $thankMailed = send_thank_you_mail(
@@ -857,6 +901,7 @@ try {
             ? ' Payment details sent to your email.'
             : ' Email delivery pending.';
 
+        if (ob_get_length()) ob_clean();
         echo json_encode([
             'success' => true,
             'message' => $msg,
@@ -866,6 +911,7 @@ try {
             'debug' => $debug_payload,
         ]);
     } else {
+        if (ob_get_length()) ob_clean();
         echo json_encode([
             'success' => false,
             'message' => 'Server error. Please try again later.',
@@ -873,6 +919,7 @@ try {
         ]);
     }
 } catch (Throwable $e) {
+    if (ob_get_length()) ob_clean();
     echo json_encode([
         'success' => false,
         'message' => 'Server error. Please try again later.',

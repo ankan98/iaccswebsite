@@ -7,42 +7,47 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-define('ENVIRONMENT', 'production');
+require_once __DIR__ . '/conn.php';
 define('CAN_DELETE', TRUE);
+
 /**
  * ACCS Membership Admin Panel
  * Features: Sorting, Filtering, XLS Export, Persistent Columns, Pagination, Status Updates
  */
 
-// --- 1. CONFIGURATION ---
-if (ENVIRONMENT === 'development') {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-    $db_host = 'localhost';
-    $db_name = 'agcinfos_iaccs';     
-    $db_user = 'root';        
-    $db_pass = '';  
-    $base_url = 'http://localhost:8008/iaccs/';
-} else {
-    ini_set('display_errors', 0);
-    error_reporting(0);
-    $db_host = 'localhost';
-    $db_name = 'agcinfos_iaccs'; 
-    $db_user = 'agcinfos_iaccs';    
-    $db_pass = 'iaccs#1234X';   
-    $base_url = 'https://iaccs.org.in/';
-}
-          
-$table   = 'membership_requests'; 
+$table = 'membership_requests';
 
-// --- 2. DATABASE CONNECTION ---
-try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Database Connection Failed: " . $e->getMessage());
+// Dynamically build base_url using current domain
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+$base_url = !empty($host) ? ($protocol . $host . '/') : (defined('BASE_URL') ? rtrim(BASE_URL, '/') . '/' : 'http://localhost/');
+
+$conn = require_once __DIR__ . '/conn.php';
+$pdo = $GLOBALS['pdo'] ?? null;
+
+if (!$pdo) {
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=agcinfos_iaccs;charset=utf8mb4", "agcinfos_iaccs", "iaccs#1234X");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $pdo->exec("SET time_zone = '+05:30'");
+    } catch (PDOException $e) {
+        try {
+            $pdo = new PDO("mysql:host=localhost;dbname=agcinfos_iaccs_test;charset=utf8mb4", "agcinfos_iaccs_test", "iaccs#1234X");
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $pdo->exec("SET time_zone = '+05:30'");
+        } catch (PDOException $e2) {
+            try {
+                $pdo = new PDO("mysql:host=localhost;dbname=agcinfos_iaccs;charset=utf8mb4", "root", "");
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                $pdo->exec("SET time_zone = '+05:30'");
+            } catch (PDOException $e3) {
+                die("Database Connection Failed: " . $e3->getMessage());
+            }
+        }
+    }
 }
 
 // --- 3. HELPER FUNCTIONS ---
@@ -451,8 +456,14 @@ include 'cms/include/header.php';
                                             elseif (strpos($key, 'date') !== false || $key === 'created_at' || $key === 'updated_at' || $key === 'dob') {
                                                 echo fmt_date($val);
                                             } elseif (in_array($key, ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id', 'paid_transaction_proof']) && !empty($val)) {
-                                                if(filter_var($val, FILTER_VALIDATE_URL) || strpos($val, '/') !== false) {
-                                                     echo '<a href="' . clean($val) . '" target="_blank" class="text-primary hover:text-primary/80" title="View"><span class="material-symbols-outlined text-[20px]">description</span></a>';
+                                                if(filter_var($val, FILTER_VALIDATE_URL) || strpos($val, '/') !== false || strpos($val, '.') !== false) {
+                                                     $clean_url = clean($val);
+                                                     $is_img = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $clean_url) || $key === 'photo';
+                                                     if ($is_img) {
+                                                         echo '<a href="' . $clean_url . '" target="_blank" rel="noopener noreferrer" title="Click to view full image in new tab" class="inline-block relative group"><img src="' . $clean_url . '" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm hover:scale-110 transition-transform" onerror="this.onerror=null; this.parentElement.innerHTML=\'<a href=\\\'' . $clean_url . '\\\' target=\\\'_blank\\\' class=\\\'text-primary font-medium hover:underline\\\'>View</a>\';" /><span class="absolute -top-1 -right-1 bg-primary text-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[10px] block">open_in_new</span></span></a>';
+                                                     } else {
+                                                         echo '<a href="' . $clean_url . '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors" title="Open Document"><span class="material-symbols-outlined text-[16px]">description</span> View <span class="material-symbols-outlined text-[12px]">open_in_new</span></a>';
+                                                     }
                                                 } else {
                                                     echo clean($val) ? clean($val) : '-';
                                                 }
@@ -664,15 +675,67 @@ include 'cms/include/header.php';
 
     function openModal(data) {
         document.getElementById('viewModal').classList.remove('hidden');
-        document.getElementById('modalName').textContent = data.name;
-        document.getElementById('modalRef').textContent = data.reference_number;
+        document.getElementById('modalName').textContent = data.name || 'Member Application';
+        document.getElementById('modalRef').textContent = data.reference_number || '';
+        
+        const docKeys = ['photo', 'id_proof', 'education_doc', 'employment_proof', 'student_id', 'paid_transaction_proof'];
         let html = '';
+
         for (const [key, value] of Object.entries(data)) {
-            if(value && key !== 'payment_response') {
-                 html += `<div class="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">${key.replace(/_/g, ' ')}</span>
-                            <p class="text-sm text-slate-900 dark:text-white font-medium break-words">${value}</p>
-                         </div>`;
+            if (value && key !== 'payment_response') {
+                const label = key.replace(/_/g, ' ');
+                const strVal = String(value).trim();
+                const isDocKey = docKeys.includes(key);
+                const isFileUrl = isDocKey || strVal.startsWith('uploads/') || strVal.startsWith('http://') || strVal.startsWith('https://');
+
+                html += `<div class="flex flex-col gap-1.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">${label}</span>`;
+
+                if (isFileUrl && (strVal.includes('/') || strVal.includes('.'))) {
+                    const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(strVal) || key === 'photo';
+                    const isPdf = /\.pdf$/i.test(strVal);
+
+                    if (isImg) {
+                        html += `
+                            <div class="mt-1">
+                                <a href="${strVal}" target="_blank" rel="noopener noreferrer" title="Click to open full size image in new tab" class="group relative inline-block overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-1 hover:border-primary transition-all shadow-sm">
+                                    <img src="${strVal}" alt="${label}" class="w-full max-w-[220px] h-32 object-cover rounded-md group-hover:scale-105 transition-transform duration-200" onerror="this.onerror=null; this.parentElement.parentElement.innerHTML='<a href=\'${strVal}\' target=\'_blank\' class=\'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors\'><span class=\'material-symbols-outlined text-sm\'>description</span> View Document</a>';" />
+                                    <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 text-white text-xs font-bold rounded-lg backdrop-blur-[1px]">
+                                        <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                        <span>Click to open in new tab</span>
+                                    </div>
+                                </a>
+                            </div>`;
+                    } else if (isPdf) {
+                        html += `
+                            <div class="mt-1">
+                                <a href="${strVal}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-100 text-xs font-semibold transition-colors shadow-sm">
+                                    <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                                    <span>View PDF Document</span>
+                                    <span class="material-symbols-outlined text-xs">open_in_new</span>
+                                </a>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="mt-1">
+                                <a href="${strVal}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold transition-colors">
+                                    <span class="material-symbols-outlined text-sm">description</span>
+                                    <span>View Document</span>
+                                    <span class="material-symbols-outlined text-xs">open_in_new</span>
+                                </a>
+                            </div>`;
+                    }
+                } else if (key === 'status') {
+                    const badgeClass = strVal.toLowerCase() === 'approved' ? 'bg-green-100 text-green-800' : (strVal.toLowerCase() === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800');
+                    html += `<div><span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeClass}">${strVal}</span></div>`;
+                } else if (key === 'payment_status') {
+                    const badgeClass = strVal.toLowerCase() === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    html += `<div><span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeClass}">${strVal}</span></div>`;
+                } else {
+                    html += `<p class="text-sm text-slate-900 dark:text-white font-medium break-words">${strVal}</p>`;
+                }
+
+                html += `</div>`;
             }
         }
         document.getElementById('modalContent').innerHTML = html;
@@ -701,19 +764,26 @@ include 'cms/include/header.php';
         const screenshotCont = document.getElementById('payScreenshotCont');
         
         // Set Transaction ID
-        txnIdDisplay.textContent = data.paid_transaction_id_number || 'Not Provided';
+        txnIdDisplay.textContent = data.paid_transaction_id_number || data.transaction_id || 'Not Provided';
         
-        // Set Screenshot
-        if (data.paid_transaction_proof) {
+        // Set Screenshot / Proof Image
+        const rawProof = data.paid_transaction_proof || '';
+        if (rawProof) {
+            const proofUrl = rawProof.startsWith('http') ? rawProof : (typeof base_url !== 'undefined' ? base_url : '') + rawProof.replace(/^\/+/, '');
             screenshotCont.innerHTML = `
-                <a href="${data.paid_transaction_proof}" target="_blank">
-                    <img src="${data.paid_transaction_proof}" alt="Payment Proof" class="w-full h-auto max-h-64 object-contain mx-auto" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="block group relative cursor-pointer overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900">
+                    <img src="${proofUrl}" alt="Payment Proof" class="w-full h-auto max-h-72 object-contain mx-auto transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5">
+                        <span class="material-symbols-outlined text-sm">open_in_new</span> Click to view in new tab
+                    </div>
                 </a>
-                <div class="p-2 text-center border-t">
-                    <a href="${data.paid_transaction_proof}" target="_blank" class="text-xs text-primary font-semibold hover:underline">View Full Image</a>
+                <div class="p-2.5 text-center border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
+                    <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-primary font-bold hover:underline inline-flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">open_in_new</span> Open Image in New Tab
+                    </a>
                 </div>`;
         } else {
-            screenshotCont.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">No screenshot uploaded</div>`;
+            screenshotCont.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm font-medium">No payment proof uploaded</div>`;
         }
         
         modal.classList.remove('hidden');

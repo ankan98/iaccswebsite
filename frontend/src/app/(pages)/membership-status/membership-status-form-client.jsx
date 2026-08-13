@@ -34,16 +34,18 @@ export default function MembershipStatusFormClient({ initialPageData }) {
     setError("");
     setResult(null);
 
-    const params = new URLSearchParams();
     const membershipId = formData.membership_id?.trim();
     const dob = formData.dob?.trim();
-    if (membershipId) params.append("membership_id", membershipId);
-    if (dob) params.append("dob", dob);
 
     if (!membershipId || !dob) {
-      setError("Please enter your membership ID and date of birth.");
+      setError("Please enter your membership ID/ Reference ID and date of birth.");
       return;
     }
+
+    const params = new URLSearchParams();
+    params.append("id", membershipId);
+    params.append("membership_id", membershipId);
+    params.append("dob", dob);
 
     setLoading(true);
     try {
@@ -71,8 +73,20 @@ export default function MembershipStatusFormClient({ initialPageData }) {
     normalizedStatus === "approved" || normalizedStatus === "approve";
   const normalizedPaymentStatus = paymentStatus.trim().toLowerCase();
   const isPaid = normalizedPaymentStatus === "paid";
-  const downloadUrl =
+  let rawDownloadUrl =
     result?.download_url || result?.data?.download_url || "";
+
+  let downloadUrl = rawDownloadUrl;
+  if (rawDownloadUrl && typeof window !== "undefined") {
+    try {
+      const parsed = new URL(rawDownloadUrl, window.location.origin);
+      parsed.protocol = window.location.protocol;
+      parsed.host = window.location.host;
+      downloadUrl = parsed.toString();
+    } catch (e) {
+      downloadUrl = rawDownloadUrl;
+    }
+  }
 
   return (
     <div className="bg-white">
@@ -104,26 +118,26 @@ export default function MembershipStatusFormClient({ initialPageData }) {
           <form onSubmit={handleSubmit} className="grid gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-               Membership ID / Reference ID
+                Membership ID / Reference ID <span className="text-red-500">*</span>
               </label>
               <input
                 name="membership_id"
                 value={formData.membership_id}
                 onChange={handleChange}
                 placeholder="Enter membership ID / Reference ID"
-                className="w-full px-4 py-3 bg-white border border-gray-300  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                className="w-full px-4 py-3 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Date of Birth
+                Date of Birth <span className="text-red-500">*</span>
               </label>
               <input
                 name="dob"
                 type="date"
                 value={formData.dob}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white border border-gray-300  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                className="w-full px-4 py-3 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               />
             </div>
 
@@ -135,7 +149,7 @@ export default function MembershipStatusFormClient({ initialPageData }) {
                   loading ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
                 }`}
               >
-                {loading ? "Checking..." : "Check Status"}
+                {loading ? "Checking..." : (pageData?.btn_text || "Check Status")}
               </button>
             </div>
           </form>

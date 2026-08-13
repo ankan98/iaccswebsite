@@ -75,11 +75,11 @@ function validateFile($file, $allowedTypes, $required = false, $maxSize = 209715
 function insert_membership_request(mysqli $conn, $form_data, $file_paths, $reference_number): bool
 {
     $data = [
-        'name' => clean($form_data['name']),
-        'father_name' => clean($form_data['father_name']),
-        'dob' => clean($form_data['dob']) ?: null,
-        'age' => clean($form_data['age']),
-        'gender' => clean($form_data['gender']),
+        'name' => clean($form_data['name'] ?? ''),
+        'father_name' => clean($form_data['father_name'] ?? ''),
+        'dob' => clean($form_data['dob'] ?? '') ?: null,
+        'age' => clean($form_data['age'] ?? ''),
+        'gender' => clean($form_data['gender'] ?? ''),
         'address' => clean($form_data['address']),
         'city' => clean($form_data['city']),
         'district' => clean($form_data['district']),
@@ -173,11 +173,11 @@ function insert_membership_request(mysqli $conn, $form_data, $file_paths, $refer
 /* ===============================
    Collect Form Data
 ================================ */
-$name              = clean($_POST['name']);
-$father_name       = clean($_POST['father_name']);
-$dob               = clean($_POST['dob']);
-$age               = clean($_POST['age']);
-$gender            = clean($_POST['gender']);
+$name              = clean($_POST['name'] ?? '');
+$father_name       = clean($_POST['father_name'] ?? '');
+$dob               = clean($_POST['dob'] ?? '');
+$age               = clean($_POST['age'] ?? '');
+$gender            = clean($_POST['gender'] ?? '');
 
 $address           = clean($_POST['address']);
 $city              = clean($_POST['city']);

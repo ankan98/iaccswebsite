@@ -1,36 +1,34 @@
 <?php
+// backend/membership-card-download.php
 ob_start();
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-error_reporting(E_ALL);
-include_once "conn.php";
-include_once "membership-card.php";
-// conn.php may enable display_errors in development; force-disable for PDF output.
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
+error_reporting(0);
+
+$conn = require_once __DIR__ . '/conn.php';
+require_once __DIR__ . '/membership-card.php';
 
 function clean($value) {
     return trim(htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8'));
 }
 
-$reference = clean($_GET['ref'] ?? '');
-$membership_id = clean($_GET['membership_id'] ?? '');
+$ref_input = clean($_GET['ref'] ?? ($_GET['reference'] ?? ($_GET['membership_id'] ?? ($_GET['id'] ?? ''))));
 $type = strtolower(clean($_GET['type'] ?? 'card'));
 
-if ($reference === '' && $membership_id === '') {
+if (empty($ref_input)) {
     http_response_code(400);
     echo 'Missing reference number or membership id.';
     exit;
 }
 
-if ($reference !== '') {
-    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE reference_number = ? AND status = 'Approved' AND LOWER(payment_status) = 'paid' LIMIT 1");
-    $stmt->bind_param("s", $reference);
-} else {
-    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE membership_id = ? AND status = 'Approved' AND LOWER(payment_status) = 'paid' LIMIT 1");
-    $stmt->bind_param("s", $membership_id);
+$stmt = $conn->prepare("SELECT * FROM membership_requests WHERE (reference_number = ? OR membership_id = ?) AND status = 'Approved' AND LOWER(payment_status) = 'paid' LIMIT 1");
+if (!$stmt) {
+    http_response_code(500);
+    echo 'Database query error: ' . htmlspecialchars($conn->error);
+    exit;
 }
 
+$stmt->bind_param("ss", $ref_input, $ref_input);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result ? $result->fetch_assoc() : null;
@@ -38,16 +36,23 @@ $stmt->close();
 
 if (!$row) {
     http_response_code(404);
-    echo 'Membership not approved/paid or not found.';
+    echo 'Membership record not found, or payment/approval is still pending.';
     exit;
 }
 
-// Prevent TCPDF header errors if any notices/warnings were buffered.
-if (ob_get_length()) { ob_clean(); }
-
-if ($type === 'card') {
-   generate_verification_slip($row, 'E_Verification_Slip.pdf', 'D');
-} else {
-generate_membership_card($row, 'Membership_Card.pdf', 'D');
-   
+// Clean output buffer before generating PDF binary output
+while (ob_get_level() > 0) {
+    ob_end_clean();
 }
+
+try {
+    if ($type === 'card') {
+        generate_verification_slip($row, 'E_Verification_Slip.pdf', 'D');
+    } else {
+        generate_membership_card($row, 'Membership_Card.pdf', 'D');
+    }
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo 'PDF Generation Error: ' . htmlspecialchars($e->getMessage());
+}
+exit;

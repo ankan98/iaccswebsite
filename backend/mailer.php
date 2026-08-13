@@ -1,5 +1,7 @@
 <?php
-require 'vendor/autoload.php';
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
 
 /**
  * @param string $to              Recipient email
@@ -9,9 +11,13 @@ require 'vendor/autoload.php';
  * @param array|string $attachments Single file path string or an array of file paths
  */
 function smtp_mailer($to, $subject, $msg, $bcc = [], $attachments = []) {
-    $mail = new PHPMailer\PHPMailer\PHPMailer();
-    
+    if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+        return false;
+    }
+
     try {
+        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+        
         // --- Server Settings ---
         $mail->isSMTP();
         $mail->SMTPAuth   = true;
@@ -45,7 +51,6 @@ function smtp_mailer($to, $subject, $msg, $bcc = [], $attachments = []) {
 
         // --- Handle Multiple Attachments ---
         if (!empty($attachments)) {
-            // Force it into an array if a single string is passed
             $fileArray = is_array($attachments) ? $attachments : [$attachments];
             
             foreach ($fileArray as $filePath) {
@@ -61,12 +66,8 @@ function smtp_mailer($to, $subject, $msg, $bcc = [], $attachments = []) {
         $mail->Body    = $msg;
         $mail->AltBody = strip_tags($msg);
 
-        if ($mail->send()) {
-            return true;
-        }
-    } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        return $mail->send();
+    } catch (Throwable $e) {
         return false;
-        
     }
 }

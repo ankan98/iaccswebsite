@@ -12,7 +12,6 @@ const createInitialFormData = () => ({
   name: "",
   father_name: "",
   dob: "",
-  age: "",
   gender: "",
 
   // Address
@@ -104,6 +103,101 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
     download_url?: string;
     message?: string;
   } | null>(null);
+
+  // Email OTP states
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [otpMessage, setOtpMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // OTP Timer countdown
+  useEffect(() => {
+    let interval: any = null;
+    if (otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [otpTimer]);
+
+  const handleSendOtp = async () => {
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setErrors((prev) => ({ ...prev, email: "Please enter a valid email address first" }));
+      return;
+    }
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy.email;
+      return copy;
+    });
+
+    setIsSendingOtp(true);
+    setOtpMessage(null);
+    setOtpSent(true);
+    setOtpTimer(60);
+    setOtpCode("");
+    try {
+      const apiBase = getPhpBaseUrl();
+      const res = await fetch(`${apiBase}/send_otp.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setOtpMessage({ type: "success", text: json.message || "A 6-digit verification code has been sent to your email." });
+      } else {
+        setOtpMessage({ type: "error", text: json.message || "Failed to send OTP." });
+      }
+    } catch (e) {
+      console.error(e);
+      setOtpMessage({ type: "error", text: "Network error sending OTP. Please try again." });
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode.trim() || otpCode.trim().length < 4) {
+      setOtpMessage({ type: "error", text: "Please enter a valid 6-digit OTP code." });
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    setOtpMessage(null);
+    try {
+      const apiBase = getPhpBaseUrl();
+      const res = await fetch(`${apiBase}/verify_otp.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, otp: otpCode }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setIsEmailVerified(true);
+        setOtpSent(false);
+        setOtpMessage({ type: "success", text: "Email verified successfully! ✓" });
+        setErrors((prev) => {
+          const copy = { ...prev };
+          delete copy.email;
+          return copy;
+        });
+      } else {
+        setOtpMessage({ type: "error", text: json.message || "Invalid OTP code." });
+      }
+    } catch (e) {
+      console.error(e);
+      setOtpMessage({ type: "error", text: "Error verifying OTP. Please try again." });
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
 
   // Refs for scroll to field
   const formRef = useRef<HTMLFormElement>(null);
@@ -330,6 +424,10 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
     setErrors({});
     setToast(null);
     setIsSubmitting(false);
+    setIsEmailVerified(false);
+    setOtpSent(false);
+    setOtpCode("");
+    setOtpMessage(null);
     try {
       window.localStorage.removeItem("membership_reference_number");
       window.localStorage.removeItem("membership_record_id");
@@ -380,6 +478,11 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
       }
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
+      if (!firstErrorField && emailRef.current) {
+        firstErrorField = emailRef.current;
+      }
+    } else if (!isEmailVerified) {
+      newErrors.email = "Please verify your email address with OTP before proceeding";
       if (!firstErrorField && emailRef.current) {
         firstErrorField = emailRef.current;
       }
@@ -563,10 +666,13 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
 
       try {
         const formDataToSend = new FormData();
+        const fileKeys = ["photo", "id_proof", "education_doc", "student_id", "employment_proof", "payment_proof"];
 
-        // Add all form data (even empty strings)
+        // Add all text form data (excluding file keys to avoid payload collision)
         Object.entries(formData).forEach(([key, value]) => {
-          formDataToSend.append(key, value ? value.toString() : "");
+          if (!fileKeys.includes(key)) {
+            formDataToSend.append(key, value !== null && value !== undefined ? value.toString() : "");
+          }
         });
 
         // Add educational qualifications as a string
@@ -849,57 +955,29 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                       <span className="text-white font-semibold">1</span>
                     </div>
-                    <span className="font-medium text-gray-700">
+                    <span className="font-semibold text-gray-800">
                       Personal Info
                     </span>
                   </div>
 
-                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-gray-200"></div>
+                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-blue-500"></div>
 
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        applicantType ? "bg-blue-600" : "bg-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`font-semibold ${
-                          applicantType ? "text-white" : "text-gray-500"
-                        }`}
-                      >
-                        2
-                      </span>
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">2</span>
                     </div>
-                    <span
-                      className={`font-medium ${
-                        applicantType ? "text-gray-700" : "text-gray-400"
-                      }`}
-                    >
+                    <span className="font-semibold text-gray-800">
                       Details
                     </span>
                   </div>
 
-                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-gray-200"></div>
+                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-blue-500"></div>
 
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        applicantType ? "bg-blue-600" : "bg-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`font-semibold ${
-                          applicantType ? "text-white" : "text-gray-500"
-                        }`}
-                      >
-                        3
-                      </span>
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">3</span>
                     </div>
-                    <span
-                      className={`font-medium ${
-                        applicantType ? "text-gray-700" : "text-gray-400"
-                      }`}
-                    >
+                    <span className="font-semibold text-gray-800">
                       Documents
                     </span>
                   </div>
@@ -938,14 +1016,6 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
                   type="date"
                   value={formData.dob}
                   onChange={handleChange}
-                />
-                <Input
-                  label="Age"
-                  name="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleChange}
-                  placeholder="Enter age"
                 />
 
                 <div className="md:col-span-2">
@@ -1106,16 +1176,108 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
                     ))}
                   </div>
                 </div>
-                <Input
-                  label="Email Address *"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  type="email"
-                  placeholder="Enter email address"
-                  error={errors.email}
-                  ref={emailRef}
-                />
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-semibold text-gray-700">Email Address *</label>
+                    {isEmailVerified && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shadow-sm">
+                        <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      ref={emailRef}
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={(e) => {
+                        handleChange(e);
+                        if (isEmailVerified) {
+                          setIsEmailVerified(false);
+                          setOtpSent(false);
+                          setOtpMessage(null);
+                        }
+                      }}
+                      placeholder="Enter email address"
+                      disabled={isEmailVerified}
+                      className={`w-full px-4 py-3 bg-white border ${
+                        errors.email
+                          ? "border-red-500 bg-red-50/50 focus:ring-red-500"
+                          : isEmailVerified
+                          ? "border-emerald-500 bg-emerald-50/60 text-emerald-950 font-medium"
+                          : "border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      } rounded-lg text-sm text-gray-900 outline-none transition-colors h-[46px]`}
+                    />
+                    {!isEmailVerified && (
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={isSendingOtp || !formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)}
+                        className="px-5 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center justify-center gap-2 shadow-sm min-w-[130px] h-[46px]"
+                      >
+                        {isSendingOtp ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span>Sending...</span>
+                          </>
+                        ) : otpSent ? (
+                          <span>Resend OTP {otpTimer > 0 ? `(${otpTimer}s)` : ""}</span>
+                        ) : (
+                          <span>Send OTP</span>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {errors.email && (
+                    <p className="mt-1.5 text-xs text-red-500 font-semibold">{errors.email}</p>
+                  )}
+
+                  {/* OTP Verification Form Field */}
+                  {otpSent && !isEmailVerified && (
+                    <div className="mt-3.5 space-y-1">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Verification OTP Code *
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          maxLength={6}
+                          value={otpCode}
+                          onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ""))}
+                          placeholder="Enter 6-digit OTP"
+                          className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-base tracking-widest font-mono font-bold text-center text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-[46px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyOtp}
+                          disabled={isVerifyingOtp || otpCode.length < 4}
+                          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center justify-center gap-2 shadow-sm min-w-[130px] h-[46px]"
+                        >
+                          {isVerifyingOtp ? (
+                            <>
+                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                              <span>Verifying...</span>
+                            </>
+                          ) : (
+                            <span>Verify OTP</span>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* OTP Message */}
+                  {otpMessage && (
+                    <p className={`mt-2 text-xs sm:text-sm font-bold ${otpMessage.type === "success" ? "text-emerald-600" : "text-red-600"}`}>
+                      {otpMessage.text}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1344,7 +1506,7 @@ export default function MembershipFormClient({ initialPageData }: { initialPageD
 
                 {/* ID Proof Upload */}
                 <div className="space-y-2">
-                  <Label>ID Card / Registration Certificate *</Label>
+                  <Label>ID Card / Registration Certificate/ Provisional Registration Certificate *</Label>
                   <FileUpload
                     id="file-upload-id-proof"
                     ref={fileInputRefs.id_proof}
@@ -1704,14 +1866,22 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, ...props }, ref) => {
+    const isRequired = label.includes("*");
+    const isFilled = Boolean(props.value && String(props.value).trim() !== "");
+    const isSuccess = isRequired && isFilled && !error;
+
     return (
       <div className="w-full">
         <Label>{label}</Label>
         <input
           ref={ref}
           {...props}
-          className={`w-full px-4 py-3 text-gray-900 bg-white border  focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
-            error ? "border-red-500" : "border-gray-300"
+          className={`w-full px-4 py-3 text-gray-900 border outline-none transition-all placeholder-gray-400 ${
+            error
+              ? "border-red-500 bg-red-50/50 focus:ring-red-500"
+              : isSuccess
+              ? "border-emerald-500 bg-emerald-50/60 focus:ring-emerald-500 focus:border-emerald-600 text-emerald-950 font-medium"
+              : "border-gray-300 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           }`}
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -1729,13 +1899,21 @@ interface TextareaProps
 }
 
 function Textarea({ label, error, ...props }: TextareaProps) {
+  const isRequired = label.includes("*");
+  const isFilled = Boolean(props.value && String(props.value).trim() !== "");
+  const isSuccess = isRequired && isFilled && !error;
+
   return (
     <div className="w-full">
       <Label>{label}</Label>
       <textarea
         {...props}
-        className={`w-full px-4 py-3 text-gray-900 bg-white border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none placeholder-gray-400 ${
-          error ? "border-red-500" : "border-gray-300"
+        className={`w-full px-4 py-3 text-gray-900 border outline-none transition-all resize-none placeholder-gray-400 ${
+          error
+            ? "border-red-500 bg-red-50/50 focus:ring-red-500"
+            : isSuccess
+            ? "border-emerald-500 bg-emerald-50/60 focus:ring-emerald-500 focus:border-emerald-600 text-emerald-950 font-medium"
+            : "border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         }`}
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -1750,13 +1928,21 @@ interface SelectInputProps
 }
 
 function SelectInput({ label, options, ...props }: SelectInputProps) {
+  const isRequired = label.includes("*");
+  const isFilled = Boolean(props.value && String(props.value).trim() !== "");
+  const isSuccess = isRequired && isFilled;
+
   return (
     <div className="w-full">
       <Label>{label}</Label>
       <div className="relative">
         <select
           {...props}
-          className="w-full pl-4 pr-10 py-3 bg-white border border-gray-300 r focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-colors"
+          className={`w-full pl-4 pr-10 py-3 border outline-none appearance-none transition-all ${
+            isSuccess
+              ? "border-emerald-500 bg-emerald-50/60 text-emerald-950 font-medium focus:ring-emerald-500"
+              : "border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          }`}
         >
           <option value="">
             Select {label.toLowerCase().replace("*", "").trim()}

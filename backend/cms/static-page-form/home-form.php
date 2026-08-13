@@ -133,6 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'hero_bg_image' => $hero_bg_image,
         'hero_btn_bg_color' => trim($_POST['hero_btn_bg_color'] ?? '#38b6ff'),
         'hero_btn_text_color' => trim($_POST['hero_btn_text_color'] ?? '#000000'),
+        'post_hero_content' => trim($_POST['post_hero_content'] ?? ''),
+        'show_post_hero_content' => isset($_POST['show_post_hero_content']) ? true : false,
+        'show_page_content' => isset($_POST['show_page_content']) ? true : false,
 
         // Vision & Mission
         'vision_title' => trim($_POST['vision_title'] ?? 'VISION'),
@@ -223,6 +226,9 @@ $defaults = [
     'hero_bg_image' => '',
     'hero_btn_bg_color' => '#38b6ff',
     'hero_btn_text_color' => '#000000',
+    'post_hero_content' => '<p style="text-align: center;">ESTD 2025. Registered as an AOP for regulatory purposes | www.iaccs.org.in | admin@iaccs.org.in<br />Address: 168, Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065</p>',
+    'show_post_hero_content' => true,
+    'show_page_content' => true,
     'vision_title' => 'VISION',
     'vision_image' => '',
     'vision_text' => 'The Association for Critical Care Sciences (ACCS) is a community-led initiative formed to represent, support, and advance the field of Critical Care Technology/Science in India. We work towards unifying students, graduates, educators, and professionals to strengthen recognition, create academic opportunities, and uphold high standards in clinical practice.',
@@ -393,6 +399,22 @@ if (isset($home_json['cards'])) {
                     <div class="space-y-2 pt-4">
                         <label for="hero_content" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Detailed Description (Rich HTML editor)</label>
                         <textarea id="hero_content" name="hero_content" rows="10" class="w-full p-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"><?= htmlspecialchars($hero_content) ?></textarea>
+                    </div>
+
+                    <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-lg">campaign</span>
+                                <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Post-Hero Announcement / Info Bar (Rich Text)</h3>
+                            </div>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="show_post_hero_content" value="1" <?= ($config['show_post_hero_content'] ?? true) ? 'checked' : '' ?> class="sr-only peer">
+                                <div class="relative w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-650 peer-checked:bg-primary"></div>
+                                <span class="ms-2.5 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Show Section</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">This content will be displayed directly below the Hero Section and above Vision &amp; Mission on the Home Page.</p>
+                        <textarea id="post_hero_content" name="post_hero_content" rows="6" class="w-full p-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"><?= htmlspecialchars($config['post_hero_content'] ?? '') ?></textarea>
                     </div>
                 </div>
 
@@ -715,13 +737,21 @@ if (isset($home_json['cards'])) {
                     </div>
                 </div>
 
-                <!-- Section 8: Page Rich Content -->
+                <!-- Section 8: Footer / Main Page Rich Content -->
                 <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                        <span class="material-symbols-outlined text-primary text-lg">article</span>
-                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Page Rich Content</h3>
+                    <div class="flex items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-lg">article</span>
+                            <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Footer / Main Page Rich Content Section</h3>
+                        </div>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="show_page_content" value="1" <?= ($config['show_page_content'] ?? true) ? 'checked' : '' ?> class="sr-only peer">
+                            <div class="relative w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-650 peer-checked:bg-primary"></div>
+                            <span class="ms-2.5 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Show Section</span>
+                        </label>
                     </div>
                     <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Footer / Page Custom Rich Content (HTML Editor)</label>
                         <textarea name="page_content" id="page_content" rows="12" placeholder="HTML and text content for the page..."
                                   class="w-full p-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"><?= htmlspecialchars($page_content) ?></textarea>
                     </div>
@@ -760,7 +790,7 @@ if (isset($home_json['cards'])) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
     tinymce.init({
-        selector: '#hero_content, #page_content, .card-desc-editor',
+        selector: '#hero_content, #post_hero_content, #page_content, .card-desc-editor',
         plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount code',
         toolbar: 'undo redo | blocks fontsize | bold italic underline | link table | numlist bullist | code removeformat',
         height: 300,

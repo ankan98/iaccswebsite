@@ -33,10 +33,11 @@ if ($is_admin_restricted_page && isset($_SESSION['user_role']) && $_SESSION['use
 
 // Database Connection
 require_once dirname(__DIR__, 2) . '/conn.php';
+$conn = $GLOBALS['conn'] ?? (($conn instanceof mysqli) ? $conn : null);
 
 // Fetch site logo from cms_settings
 $cms_site_logo = '';
-$cms_settings_res = isset($conn) ? $conn->query("SELECT site_logo FROM cms_settings ORDER BY id ASC LIMIT 1") : false;
+$cms_settings_res = ($conn && ($conn instanceof mysqli)) ? $conn->query("SELECT site_logo FROM cms_settings ORDER BY id ASC LIMIT 1") : false;
 if ($cms_settings_res && $cms_settings_res->num_rows > 0) {
     $cms_settings_row = $cms_settings_res->fetch_assoc();
     if (!empty($cms_settings_row['site_logo'])) {
