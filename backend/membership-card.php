@@ -473,7 +473,7 @@ function generate_verification_slip($data, $file_name = 'E_Verification_Slip.pdf
     $pdf->Cell(0, 4, 'Reg. No.- IV-1903-00117/2026   Darpan ID- WB/2026/1125917', 0, 1, 'C');
     
     $pdf->SetFont('dejavusans', '', 8);
-    $pdf->Cell(0, 4, 'Address:Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065', 0, 1, 'C');
+    $pdf->Cell(0, 4, 'Address: Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065', 0, 1, 'C');
 
     $pdf->Ln(2);
     $pdf->SetDrawColor(0, 0, 0); 

@@ -119,11 +119,11 @@ export default function HomeClient({ initialPageData, backendUrl }: HomeClientPr
                 {pageData?.subheading || "RECOGNITION . STANDARDS . EXCELLENCE ."}
               </p>
             </div>
-            {pageData?.content ? (
+            {(config?.hero_content || pageData?.content) ? (
               <div
                 className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed"
                 style={{ fontFamily: '"Times New Roman", Times, serif' }}
-                dangerouslySetInnerHTML={{ __html: pageData.content }}
+                dangerouslySetInnerHTML={{ __html: config?.hero_content || pageData?.content }}
               />
             ) : (
               <p
@@ -153,24 +153,10 @@ export default function HomeClient({ initialPageData, backendUrl }: HomeClientPr
 
       {/* <!-- Post-Hero Information Bar --> */}
       {config?.show_post_hero_content !== false && config?.show_post_hero_content !== 0 && config?.show_post_hero_content !== "0" && config?.show_post_hero_content !== "false" && (
-        <section className="">
-          <div className="">
-            {config?.post_hero_content ? (
+        <section className="px-4 sm:px-6 lg:px-[110px] pt-6">
+          <div className="pt-6">
+            {config?.post_hero_content && (
               <div dangerouslySetInnerHTML={{ __html: config.post_hero_content }} />
-            ) : (
-              <div className="space-y-1">
-                <p>
-                  ESTD 2025. Registered as an AOP for regulatory purposes |{" "}
-                  <a href="https://www.iaccs.org.in" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">
-                    www.iaccs.org.in
-                  </a>{" "}
-                  |{" "}
-                  <a href="mailto:admin@iaccs.org.in" className="underline hover:text-blue-600">
-                    admin@iaccs.org.in
-                  </a>
-                </p>
-                <p>Address: 168, Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065</p>
-              </div>
             )}
           </div>
         </section>

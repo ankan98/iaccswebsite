@@ -133,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'hero_bg_image' => $hero_bg_image,
         'hero_btn_bg_color' => trim($_POST['hero_btn_bg_color'] ?? '#38b6ff'),
         'hero_btn_text_color' => trim($_POST['hero_btn_text_color'] ?? '#000000'),
+        'hero_content' => trim($_POST['hero_content'] ?? ''),
         'post_hero_content' => trim($_POST['post_hero_content'] ?? ''),
         'show_post_hero_content' => isset($_POST['show_post_hero_content']) ? true : false,
         'show_page_content' => isset($_POST['show_page_content']) ? true : false,
@@ -179,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hero_btn_text = trim($_POST['hero_btn_text'] ?? '');
     $hero_btn_link = trim($_POST['hero_btn_link'] ?? '');
     $hero_content = trim($_POST['hero_content'] ?? '');
-    $page_content = trim($_POST['page_content'] ?? $hero_content);
+    $page_content = trim($_POST['page_content'] ?? '');
     $custom_css = trim($_POST['custom_css'] ?? '');
     $type = trim($_POST['type'] ?? 'static');
 
@@ -212,20 +213,12 @@ $stmt->execute();
 $home_page = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Resolve existing details
-$hero_heading = $home_page['heading'] ?? 'Welcome to ACCS The Association for Critical Care Sciences';
-$hero_subheading = $home_page['subheading'] ?? 'RECOGNITION . STANDARDS . EXCELLENCE .';
-$hero_btn_text = $home_page['btn_text'] ?? 'JOIN US TODAY';
-$hero_btn_link = $home_page['btn_link'] ?? '/membership';
-$hero_content = $home_page['content'] ?? '<p>ACCS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession.</p>';
-$page_content = $home_page['content'] ?? '';
-$custom_css = $home_page['custom_css'] ?? '';
-
 // Defaults for JSON fields
 $defaults = [
     'hero_bg_image' => '',
     'hero_btn_bg_color' => '#38b6ff',
     'hero_btn_text_color' => '#000000',
+    'hero_content' => '<p>ACCS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession.</p>',
     'post_hero_content' => '<p style="text-align: center;">ESTD 2025. Registered as an AOP for regulatory purposes | www.iaccs.org.in | admin@iaccs.org.in<br />Address: 168, Mathkal, Nazrul Sarani, Dumdum Cantonment, Kolkata, 700065</p>',
     'show_post_hero_content' => true,
     'show_page_content' => true,
@@ -307,6 +300,15 @@ if (isset($home_json['carousel_images'])) {
 if (isset($home_json['cards'])) {
     $config['cards'] = $home_json['cards'];
 }
+
+// Resolve existing details
+$hero_heading = $home_page['heading'] ?? 'Welcome to ACCS The Association for Critical Care Sciences';
+$hero_subheading = $home_page['subheading'] ?? 'RECOGNITION . STANDARDS . EXCELLENCE .';
+$hero_btn_text = $home_page['btn_text'] ?? 'JOIN US TODAY';
+$hero_btn_link = $home_page['btn_link'] ?? '/membership';
+$hero_content = $config['hero_content'] ?? '';
+$page_content = $home_page['content'] ?? '';
+$custom_css = $home_page['custom_css'] ?? '';
 ?>
 
 <div class="w-full space-y-6 pb-28">
